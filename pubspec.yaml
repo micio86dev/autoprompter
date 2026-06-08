@@ -60,6 +60,22 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+# App launcher / home-screen icon for iOS and Android.
+# Run `dart run flutter_launcher_icons` after changing icon.png.
+flutter_launcher_icons:
+  image_path: "icon.png"
+  # iOS app icon (App Store rejects alpha, so it is stripped).
+  ios: true
+  remove_alpha_ios: true
+  # Android legacy launcher icon (pre-API 26).
+  android: "ic_launcher"
+  min_sdk_android: 21
+  # Android adaptive launcher icon (API 26+): the artwork already
+  # has a black ground, so the background layer matches it.
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

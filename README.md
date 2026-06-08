@@ -5,6 +5,23 @@ your scripts (prompts) in a WYSIWYG editor, save them locally, and while reading
 the app **follows your voice** from the microphone, highlighting the words and
 automatically scrolling the text.
 
+## Download
+
+The latest **signed Android APK** is published on the
+[**Releases**](https://github.com/micio86dev/autoprompter/releases/latest) page —
+install it directly, no Play Store required.
+
+- **Works on:** Android 7.0 and newer (the APK is universal — `arm64-v8a`,
+  `armeabi-v7a`, `x86_64`).
+- **Install:** open the downloaded `.apk` and, when asked, allow *"Install unknown
+  apps"* for your browser or file manager. Google Play Protect may flag it as
+  unverified (it is signed with the developer's own key, not distributed through
+  Play) — choose *Install anyway*.
+- **Permissions:** microphone (on-device speech recognition) and internet.
+
+> iOS is not offered as a direct download — Apple only allows installation via
+> Xcode, TestFlight or the App Store.
+
 ## Features
 
 - **Prompt list**: create, open, delete (swipe), **duplicate**, **search**,

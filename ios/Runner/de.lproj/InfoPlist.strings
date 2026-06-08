@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "Das Mikrofon wird verwendet, um deiner Stimme zu folgen und den Teleprompter-Text automatisch zu scrollen.";
+"NSSpeechRecognitionUsageDescription" = "Die Spracherkennung wird verwendet, um die gelesenen Wörter hervorzuheben und den Text zu scrollen.";

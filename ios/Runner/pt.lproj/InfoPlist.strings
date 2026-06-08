@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "O microfone é usado para seguir sua voz e rolar automaticamente o texto do teleprompter.";
+"NSSpeechRecognitionUsageDescription" = "O reconhecimento de voz é usado para destacar as palavras que você lê e rolar o texto.";

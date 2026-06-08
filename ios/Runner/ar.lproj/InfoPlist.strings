@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "يُستخدم الميكروفون لمتابعة صوتك وتمرير نص التيليبرومبتر تلقائيًا.";
+"NSSpeechRecognitionUsageDescription" = "يُستخدم التعرّف على الكلام لإبراز الكلمات التي تقرؤها وتمرير النص.";

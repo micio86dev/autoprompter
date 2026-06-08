@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "マイクは、あなたの声に合わせてテレプロンプターのテキストを自動でスクロールするために使用されます。";
+"NSSpeechRecognitionUsageDescription" = "音声認識は、読んでいる単語をハイライトし、テキストをスクロールするために使用されます。";

@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "麦克风用于跟随你的声音并自动滚动提词器文本。";
+"NSSpeechRecognitionUsageDescription" = "语音识别用于高亮你朗读的词语并滚动文本。";

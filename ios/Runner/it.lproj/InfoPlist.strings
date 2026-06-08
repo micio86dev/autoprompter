@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "Il microfono serve per seguire la tua voce e far scorrere automaticamente il testo del teleprompter.";
+"NSSpeechRecognitionUsageDescription" = "Il riconoscimento vocale serve per evidenziare le parole che leggi e far scorrere il testo.";

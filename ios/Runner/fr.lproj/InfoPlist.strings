@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "Le microphone est utilisé pour suivre votre voix et faire défiler automatiquement le texte du téléprompteur.";
+"NSSpeechRecognitionUsageDescription" = "La reconnaissance vocale est utilisée pour surligner les mots que vous lisez et faire défiler le texte.";

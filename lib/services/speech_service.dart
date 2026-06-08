@@ -39,7 +39,12 @@ class SttSpeechService implements SpeechService {
 
   bool _available = false;
   bool _wantListening = false;
+  bool _restarting = false;
   String _localeId = 'it_IT';
+
+  /// Delay before re-listening, to let the native engine release the previous
+  /// session (restarting immediately often fails with a "busy" error).
+  static const Duration _restartDelay = Duration(milliseconds: 400);
 
   /// Number of words already emitted for the current listening session.
   int _emittedWordCount = 0;
@@ -66,13 +71,17 @@ class SttSpeechService implements SpeechService {
 
   /// Speech errors are either transient or permanent. Transient ones
   /// (e.g. `error_no_match`, `error_speech_timeout`) are routine during
-  /// continuous dictation — the native session ends and [_handleStatus]
-  /// restarts it — so we must NOT surface them as a UI error. Only permanent
-  /// errors (e.g. permission denied, recognizer unavailable) are reported.
+  /// continuous dictation — we must NOT surface them as a UI error. Instead we
+  /// schedule a restart, because an error can leave the engine stopped without
+  /// a following `done`/`notListening` status (which is what made it freeze
+  /// until the user manually stopped and resumed). Only permanent errors
+  /// (e.g. permission denied, recognizer unavailable) are reported and stop us.
   void _handleError(SpeechRecognitionError error) {
     if (error.permanent) {
       _onError?.call(error.errorMsg);
+      return;
     }
+    if (_wantListening) _scheduleRestart();
   }
 
   @override
@@ -106,6 +115,7 @@ class SttSpeechService implements SpeechService {
     }
 
     _wantListening = true;
+    _restarting = false;
     await _listen();
     return true;
   }
@@ -113,6 +123,7 @@ class SttSpeechService implements SpeechService {
   @override
   Future<void> stop() async {
     _wantListening = false;
+    _restarting = false;
     await _stt.stop();
     _onListeningChanged?.call(false);
   }
@@ -124,19 +135,38 @@ class SttSpeechService implements SpeechService {
   }
 
   Future<void> _listen() async {
+    // Don't stack a second session on top of an active one.
+    if (!_wantListening || _stt.isListening) return;
     _emittedWordCount = 0;
-    await _stt.listen(
-      onResult: _handleResult,
-      listenOptions: SpeechListenOptions(
-        localeId: _localeId,
-        partialResults: true,
-        listenMode: ListenMode.dictation,
-        cancelOnError: false,
-        listenFor: const Duration(minutes: 5),
-        pauseFor: const Duration(seconds: 30),
-      ),
-    );
-    _onListeningChanged?.call(true);
+    try {
+      await _stt.listen(
+        onResult: _handleResult,
+        listenOptions: SpeechListenOptions(
+          localeId: _localeId,
+          partialResults: true,
+          listenMode: ListenMode.dictation,
+          cancelOnError: false,
+          listenFor: const Duration(minutes: 5),
+          pauseFor: const Duration(seconds: 30),
+        ),
+      );
+      _onListeningChanged?.call(true);
+    } catch (_) {
+      // The engine wasn't ready (e.g. still tearing down the previous session).
+      // Retry shortly so listening recovers on its own.
+      _scheduleRestart();
+    }
+  }
+
+  /// Schedules a single delayed restart, de-duplicated via [_restarting] so
+  /// overlapping triggers (status + error) collapse into one re-listen.
+  void _scheduleRestart() {
+    if (!_wantListening || _restarting) return;
+    _restarting = true;
+    Future.delayed(_restartDelay, () {
+      _restarting = false;
+      if (_wantListening && !_stt.isListening) _listen();
+    });
   }
 
   void _handleResult(SpeechRecognitionResult result) {
@@ -162,12 +192,12 @@ class SttSpeechService implements SpeechService {
     final listening = status == SpeechToText.listeningStatus;
     _onListeningChanged?.call(listening);
 
-    // Native sessions end after pauses/timeouts: restart if the user still
-    // wants to listen, so dictation stays continuous.
+    // Native sessions end after pauses/timeouts: restart (with a small delay)
+    // if the user still wants to listen, so dictation stays continuous.
     final stopped = status == SpeechToText.doneStatus ||
         status == SpeechToText.notListeningStatus;
     if (stopped && _wantListening) {
-      _listen();
+      _scheduleRestart();
     }
   }
 }

@@ -31,3 +31,12 @@
 - [ ] Hierarchical folders (beyond flat tags).
 - [ ] Optional cloud sync of prompts.
 - [ ] Rendered Markdown preview (not just source) next to the editor.
+
+## Known issues / possible improvements
+- [ ] **Speech recognition watchdog.** Continuous dictation now self-heals when
+  a session ends or hits a transient error (delayed, de-duplicated restart in
+  `lib/services/speech_service.dart`). One rare case remains: the native engine
+  stays in the `listening` state but stops producing results without emitting
+  any error. It currently recovers within ~30s via the `pauseFor` silence
+  timeout (or 5 min via `listenFor`). A watchdog timer that forces a restart
+  after N seconds with no new words would make recovery near-instant.

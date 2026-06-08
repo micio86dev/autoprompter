@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 import '../services/word_matcher.dart';
 
-/// Rende il testo del prompt parola-per-parola con effetto "karaoke":
-/// parole già lette attenuate, parola corrente evidenziata, parole successive
-/// in chiaro. La parola corrente porta [currentWordKey] per lo scroll.
+/// Renders the prompt text word-by-word with a "karaoke" effect: already-read
+/// words dimmed, the current word highlighted, upcoming words bright. The
+/// current word carries [currentWordKey] for scrolling.
 ///
-/// Toccando una parola si richiama [onWordTap], usato per riposizionare
-/// manualmente il punto di lettura.
+/// Tapping a word calls [onWordTap], used to manually reposition the reading
+/// point.
 class TeleprompterText extends StatefulWidget {
   const TeleprompterText({
     super.key,
@@ -34,13 +34,13 @@ class TeleprompterText extends StatefulWidget {
 }
 
 class _TeleprompterTextState extends State<TeleprompterText> {
-  static const _readColor = Color(0x66FFFFFF); // letto: attenuato
-  static const _upcomingColor = Color(0xFFFFFFFF); // da leggere
-  static const _currentColor = Color(0xFF101010); // testo evidenziato
-  static const _currentBg = Color(0xFFFFC107); // sfondo parola corrente
+  static const _readColor = Color(0x66FFFFFF); // read: dimmed
+  static const _upcomingColor = Color(0xFFFFFFFF); // upcoming
+  static const _currentColor = Color(0xFF101010); // highlighted text
+  static const _currentBg = Color(0xFFFFC107); // current word background
 
-  /// Recognizer per il tap sulle parole; rigenerati a ogni build e ripuliti
-  /// per evitare leak.
+  /// Recognizers for tapping on words; rebuilt on every build and cleaned up to
+  /// avoid leaks.
   final List<TapGestureRecognizer> _recognizers = [];
 
   @override

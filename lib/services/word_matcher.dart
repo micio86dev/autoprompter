@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-/// Un segmento di testo: una parola (evidenziabile) oppure un separatore
-/// (spazi, punteggiatura, ritorni a capo) da rendere così com'è.
+/// A text segment: either a word (highlightable) or a separator (spaces,
+/// punctuation, line breaks) to render as-is.
 class TextSegment {
   TextSegment({
     required this.text,
@@ -12,64 +12,63 @@ class TextSegment {
   final String text;
   final bool isWord;
 
-  /// Indice della parola (0-based) tra le sole parole; -1 per i separatori.
+  /// Index of the word (0-based) among words only; -1 for separators.
   final int wordIndex;
 }
 
-/// Una parola riconoscibile, con la sua forma normalizzata per il confronto.
+/// A recognizable word, with its normalized form used for comparison.
 class _Word {
   _Word(this.normalized);
   final String normalized;
 }
 
-/// Allinea le parole pronunciate (dal riconoscimento vocale) al testo del
-/// prompt, mantenendo aggiornato un indice "parola corrente" man mano che si
-/// legge.
+/// Aligns the spoken words (from speech recognition) with the prompt text,
+/// keeping a "current word" index up to date as the user reads.
 ///
-/// È pensato per essere robusto alla lettura reale, non perfetta:
-///  - parole **saltate** nel copione,
-///  - parole **sbagliate o cambiate**,
-///  - parole **fuori copione** (intercalari, commenti),
-///  - **pause** e ripartenze in un punto diverso.
+/// It is designed to be robust to real, imperfect reading:
+///  - **skipped** words in the script,
+///  - **wrong or changed** words,
+///  - **off-script** words (fillers, asides),
+///  - **pauses** and restarts at a different point.
 ///
-/// Strategia: tiene un piccolo buffer delle ultime parole pronunciate e, a ogni
-/// nuova parola, cerca la posizione del testo meglio **confermata dal contesto
-/// recente** — prima in una finestra locale (in avanti e un po' all'indietro),
-/// poi, se non trova nulla di solido, con una ricerca **globale** che permette
-/// di riagganciarsi sempre dopo un salto ampio o una pausa.
+/// Strategy: it keeps a small buffer of the most recent spoken words and, on
+/// each new word, looks for the text position best **confirmed by the recent
+/// context** — first in a local window (forward and a little backward), then,
+/// if nothing solid is found, with a **global** search that allows re-syncing
+/// after a large jump or a pause.
 class WordMatcher {
   WordMatcher(String text, {this.window = 30}) {
     _tokenize(text);
   }
 
-  /// Quante parole **avanti** cercare nella finestra locale.
+  /// How many words **ahead** to search in the local window.
   final int window;
 
-  /// Quante parole **indietro** tollerare localmente (riletture / falsi salti).
+  /// How many words **behind** to tolerate locally (re-reads / false jumps).
   static const int _back = 6;
 
-  /// Quante parole recenti usare come "contesto" per confermare la posizione.
+  /// How many recent words to use as "context" to confirm the position.
   static const int _context = 4;
 
-  /// Quante parole pronunciate tenere in memoria.
+  /// How many spoken words to keep in memory.
   static const int _recentCap = 8;
 
   final List<TextSegment> segments = [];
   final List<_Word> _words = [];
 
-  /// Ultime parole pronunciate (normalizzate), usate per riagganciare la
-  /// posizione anche dopo salti o pause.
+  /// Most recent spoken words (normalized), used to re-sync the position even
+  /// after jumps or pauses.
   final List<String> _recent = [];
 
-  /// Indice dell'ultima parola riconosciuta (-1 = niente ancora).
+  /// Index of the last recognized word (-1 = nothing yet).
   int currentIndex = -1;
 
   int get wordCount => _words.length;
 
-  /// Numero di parole già lette.
+  /// Number of words already read.
   int get matchedCount => currentIndex + 1;
 
-  /// Avanzamento nella lettura, da 0.0 a 1.0.
+  /// Reading progress, from 0.0 to 1.0.
   double get progress =>
       _words.isEmpty ? 0 : (matchedCount / _words.length).clamp(0.0, 1.0);
 
@@ -78,16 +77,16 @@ class WordMatcher {
     _recent.clear();
   }
 
-  /// Imposta manualmente la posizione di lettura (es. tap su una parola).
-  /// Azzera il contesto recente, così l'allineamento vocale riprende da qui.
+  /// Manually sets the reading position (e.g. tapping a word). Clears the recent
+  /// context so voice alignment resumes from here.
   void setCurrentWordIndex(int index) {
     if (_words.isEmpty) return;
     currentIndex = index.clamp(-1, _words.length - 1);
     _recent.clear();
   }
 
-  /// Consuma le parole pronunciate, riagganciando [currentIndex] alla posizione
-  /// più probabile nel testo. Ritorna true se l'indice è cambiato.
+  /// Consumes the spoken words, re-syncing [currentIndex] to the most likely
+  /// position in the text. Returns true if the index changed.
   bool consume(Iterable<String> spokenWords) {
     final before = currentIndex;
     for (final spoken in spokenWords) {
@@ -102,18 +101,18 @@ class WordMatcher {
     return currentIndex != before;
   }
 
-  // --- riaggancio ---
+  // --- re-syncing ---
 
-  /// Quanto bene il contesto recente si allinea se l'**ultima** parola
-  /// pronunciata corrisponde alla parola del prompt all'indice [i].
+  /// How well the recent context aligns if the **last** spoken word matches the
+  /// prompt word at index [i].
   ///
-  /// Ritorna -1 se l'ultima parola non corrisponde affatto a `i`; altrimenti un
-  /// punteggio: 2 di base, +1 per ogni parola recente precedente ritrovata tra
-  /// le parole del prompt subito prima di `i` (tolleranza ai salti).
+  /// Returns -1 if the last word does not match `i` at all; otherwise a score:
+  /// 2 as a baseline, +1 for every earlier recent word found among the prompt
+  /// words right before `i` (jump tolerance).
   int _score(int i) {
     if (i < 0 || i >= _words.length) return -1;
     if (!_matches(_recent.last, _words[i].normalized)) return -1;
-    var score = 2; // l'ultima parola pronunciata corrisponde a `i`
+    var score = 2; // the last spoken word matches `i`
     final lo = math.max(0, i - _context);
     final start = math.max(0, _recent.length - 1 - _context);
     for (var r = _recent.length - 2; r >= start; r--) {
@@ -127,10 +126,10 @@ class WordMatcher {
     return score;
   }
 
-  /// Regole di accettazione di un candidato, calibrate per evitare scatti:
-  ///  - avanzamento ravvicinato (1..4 parole): basta la corrispondenza;
-  ///  - salto in avanti più ampio: serve almeno una conferma dal contesto;
-  ///  - movimento all'indietro o lontano: serve un contesto forte.
+  /// Acceptance rules for a candidate, tuned to avoid jitter:
+  ///  - close forward move (1..4 words): a plain match is enough;
+  ///  - larger forward jump: at least one context confirmation is required;
+  ///  - backward or far move: a strong context is required.
   bool _acceptable(int i, int score) {
     if (score < 2) return false;
     final step = i - currentIndex;
@@ -142,9 +141,9 @@ class WordMatcher {
   void _advance() {
     if (_words.isEmpty) return;
 
-    // 1) Ricerca locale: attorno alla posizione corrente, in avanti e un po'
-    //    all'indietro. A parità di punteggio si preferisce la posizione più
-    //    vicina in avanti, per non scavalcare frasi ripetute.
+    // 1) Local search: around the current position, forward and a little
+    //    backward. On a score tie, prefer the closest forward position so we
+    //    don't overshoot repeated phrases.
     final lo = math.max(0, currentIndex - _back);
     final hi = math.min(_words.length - 1, currentIndex + window);
     var bestI = -1;
@@ -165,9 +164,9 @@ class WordMatcher {
       return;
     }
 
-    // 2) Riaggancio globale: dopo un salto ampio o una pausa, cerca ovunque la
-    //    posizione meglio confermata dal contesto recente. La soglia alta evita
-    //    salti casuali su una singola parola comune.
+    // 2) Global re-sync: after a large jump or a pause, search everywhere for
+    //    the position best confirmed by the recent context. The high threshold
+    //    avoids random jumps on a single common word.
     bestI = -1;
     bestScore = 0;
     for (var i = 0; i < _words.length; i++) {
@@ -182,13 +181,13 @@ class WordMatcher {
     }
   }
 
-  /// Ordina i candidati a pari punteggio: prima quelli in avanti e più vicini.
+  /// Orders candidates with an equal score: forward and closer ones first.
   int _forwardBias(int i) {
     final step = i - currentIndex;
     return step >= 1 ? step : 1000 - step;
   }
 
-  // --- interni ---
+  // --- internals ---
 
   static final RegExp _wordPattern =
       RegExp(r"[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*", unicode: true);
@@ -221,9 +220,9 @@ class WordMatcher {
 
   bool _matches(String spoken, String target) {
     if (spoken == target) return true;
-    // Corrispondenza per prefisso (utile con risultati parziali).
+    // Prefix match (useful with partial results).
     if (spoken.length >= 4 && target.startsWith(spoken)) return true;
-    // Tolleranza agli errori per parole abbastanza lunghe.
+    // Error tolerance for words long enough.
     if (spoken.length >= 4 && target.length >= 4) {
       final threshold = spoken.length >= 7 ? 2 : 1;
       if (_levenshtein(spoken, target) <= threshold) return true;
@@ -246,7 +245,7 @@ class WordMatcher {
     for (final rune in lower.runes) {
       final ch = String.fromCharCode(rune);
       final replaced = _diacritics[ch] ?? ch;
-      // Tiene solo lettere e cifre.
+      // Keep only letters and digits.
       if (RegExp(r'[\p{L}\p{N}]', unicode: true).hasMatch(replaced)) {
         buffer.write(replaced);
       }

@@ -2,7 +2,7 @@ import 'package:autoprompter/data/prompt_repository.dart';
 import 'package:autoprompter/models/prompt.dart';
 import 'package:autoprompter/services/speech_service.dart';
 
-/// Repository in memoria per i test (sostituisce sqflite).
+/// In-memory repository for tests (replaces sqflite).
 class FakePromptRepository implements PromptRepository {
   FakePromptRepository([List<Prompt> seed = const []]) {
     for (final p in seed) {
@@ -29,8 +29,8 @@ class FakePromptRepository implements PromptRepository {
   Future<void> delete(String id) async => _store.remove(id);
 }
 
-/// Servizio vocale finto: cattura le callback e permette ai test di "dettare"
-/// parole con [emit], senza toccare i canali della piattaforma.
+/// Fake speech service: captures the callbacks and lets tests "dictate" words
+/// with [emit], without touching the platform channels.
 class FakeSpeechService implements SpeechService {
   void Function(List<String>)? _onWords;
   void Function(bool)? _onListeningChanged;
@@ -45,7 +45,7 @@ class FakeSpeechService implements SpeechService {
 
   @override
   Future<List<SpeechLocale>> locales() async =>
-      const [SpeechLocale('it_IT', 'Italiano (Italia)')];
+      const [SpeechLocale('it_IT', 'Italian (Italy)')];
 
   @override
   Future<bool> start({
@@ -56,7 +56,7 @@ class FakeSpeechService implements SpeechService {
   }) async {
     lastLocaleId = localeId;
     if (!startResult) {
-      onError?.call('non disponibile');
+      onError?.call('unavailable');
       return false;
     }
     _onWords = onWords;
@@ -77,6 +77,6 @@ class FakeSpeechService implements SpeechService {
     _listening = false;
   }
 
-  /// Simula il riconoscimento di nuove parole.
+  /// Simulates the recognition of new words.
   void emit(List<String> words) => _onWords?.call(words);
 }

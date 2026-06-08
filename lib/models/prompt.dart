@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
 
-/// Un prompt (testo da leggere al teleprompter).
+/// A prompt (text to be read on the teleprompter).
 ///
-/// Il contenuto è memorizzato in **Markdown**; [localeId] è la lingua usata
-/// dal riconoscimento vocale per questo prompt (es. `it_IT`). [tags] sono
-/// etichette libere usate per organizzare e filtrare i prompt.
+/// The content is stored as **Markdown**; [localeId] is the language used by
+/// speech recognition for this prompt (e.g. `it_IT`). [tags] are free-form
+/// labels used to organize and filter prompts.
 class Prompt {
   Prompt({
     required this.id,
@@ -26,7 +26,7 @@ class Prompt {
   final DateTime updatedAt;
   final List<String> tags;
 
-  /// Crea un nuovo prompt vuoto con id e timestamp generati.
+  /// Creates a new empty prompt with a generated id and timestamps.
   factory Prompt.create({
     String title = '',
     String contentMarkdown = '',
@@ -85,14 +85,14 @@ class Prompt {
         tags: decodeTags(map['tags'] as String?),
       );
 
-  /// Serializza i tag come array JSON (robusto a virgole e caratteri speciali).
+  /// Serializes the tags as a JSON array (robust to commas and special chars).
   static String encodeTags(List<String> tags) {
     final cleaned = normalizeTags(tags);
     return cleaned.isEmpty ? '' : jsonEncode(cleaned);
   }
 
-  /// Decodifica i tag dallo storage, tollerando formati legacy/CSV e valori
-  /// nulli o malformati.
+  /// Decodes the tags from storage, tolerating legacy/CSV formats and null or
+  /// malformed values.
   static List<String> decodeTags(String? raw) {
     if (raw == null || raw.trim().isEmpty) return const [];
     try {
@@ -101,13 +101,13 @@ class Prompt {
         return normalizeTags(decoded.map((e) => e.toString()));
       }
     } catch (_) {
-      // Formato non-JSON (es. CSV legacy): ripiega sulla virgola.
+      // Non-JSON format (e.g. legacy CSV): fall back to comma splitting.
     }
     return normalizeTags(raw.split(','));
   }
 
-  /// Pulisce e deduplica una lista di tag (trim, scarta i vuoti, ordine
-  /// preservato e confronto case-insensitive).
+  /// Cleans and de-duplicates a list of tags (trim, drop empties, preserve
+  /// order, case-insensitive comparison).
   static List<String> normalizeTags(Iterable<String> tags) {
     final result = <String>[];
     final seen = <String>{};

@@ -3,28 +3,28 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Prompt tags', () {
-    test('normalizza: trim, scarta vuoti, deduplica case-insensitive', () {
-      final tags = Prompt.normalizeTags(['  Lavoro ', 'lavoro', '', 'Demo']);
-      expect(tags, ['Lavoro', 'Demo']);
+    test('normalizes: trim, drop empties, de-duplicate case-insensitively', () {
+      final tags = Prompt.normalizeTags(['  Work ', 'work', '', 'Demo']);
+      expect(tags, ['Work', 'Demo']);
     });
 
     test('encode/decode round-trip via JSON', () {
-      const tags = ['lavoro', 'intro, breve', 'çà'];
+      const tags = ['work', 'intro, brief', 'çà'];
       final encoded = Prompt.encodeTags(tags);
       expect(Prompt.decodeTags(encoded), tags);
     });
 
-    test('decode tollera null e stringa vuota', () {
+    test('decode tolerates null and empty string', () {
       expect(Prompt.decodeTags(null), isEmpty);
       expect(Prompt.decodeTags(''), isEmpty);
       expect(Prompt.decodeTags('   '), isEmpty);
     });
 
     test('decode legacy CSV', () {
-      expect(Prompt.decodeTags('uno, due ,tre'), ['uno', 'due', 'tre']);
+      expect(Prompt.decodeTags('one, two ,three'), ['one', 'two', 'three']);
     });
 
-    test('toMap/fromMap preserva i tag', () {
+    test('toMap/fromMap preserves the tags', () {
       final p = Prompt.create(title: 'T', tags: ['a', 'b']);
       final restored = Prompt.fromMap(p.toMap());
       expect(restored.tags, ['a', 'b']);
@@ -32,12 +32,12 @@ void main() {
       expect(restored.title, 'T');
     });
 
-    test('fromMap senza colonna tags (riga legacy) -> lista vuota', () {
+    test('fromMap without a tags column (legacy row) -> empty list', () {
       final p = Prompt.fromMap({
         'id': 'x',
-        'title': 'Vecchio',
-        'content_markdown': 'ciao',
-        'locale_id': 'it_IT',
+        'title': 'Old',
+        'content_markdown': 'hi',
+        'locale_id': 'en_US',
         'created_at': 0,
         'updated_at': 0,
       });

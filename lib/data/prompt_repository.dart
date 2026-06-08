@@ -3,21 +3,21 @@ import 'package:sqflite/sqflite.dart';
 
 import '../models/prompt.dart';
 
-/// Contratto per lo storage dei prompt. Permette di sostituire l'archiviazione
-/// reale (sqflite) con un fake in memoria nei test.
+/// Contract for prompt storage. Lets the real storage (sqflite) be swapped for
+/// an in-memory fake in tests.
 abstract class PromptRepository {
-  /// Tutti i prompt, ordinati dal più recente.
+  /// All prompts, ordered from most recent.
   Future<List<Prompt>> getAll();
 
   Future<Prompt?> getById(String id);
 
-  /// Inserisce o aggiorna un prompt.
+  /// Inserts or updates a prompt.
   Future<void> upsert(Prompt prompt);
 
   Future<void> delete(String id);
 }
 
-/// Implementazione di [PromptRepository] basata su sqflite (storage locale).
+/// [PromptRepository] implementation backed by sqflite (local storage).
 class SqflitePromptRepository implements PromptRepository {
   SqflitePromptRepository._();
 

@@ -1,24 +1,24 @@
 import 'markdown_service.dart';
 
-/// Statistiche di lettura di un testo: numero di parole e tempo di lettura
-/// stimato a una certa velocità di eloquio.
+/// Reading statistics for a text: word count and estimated reading time at a
+/// given speaking rate.
 class ReadingStats {
   const ReadingStats({required this.wordCount, required this.duration});
 
   final int wordCount;
   final Duration duration;
 
-  /// Velocità di lettura ad alta voce predefinita (parole al minuto). Un valore
-  /// realistico per il parlato/teleprompter è ~150 wpm.
+  /// Default read-aloud speed (words per minute). A realistic value for
+  /// speech/teleprompter is ~150 wpm.
   static const int defaultWordsPerMinute = 150;
 
   static final RegExp _wordPattern =
       RegExp(r"[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*", unicode: true);
 
-  /// Conta le parole in un testo semplice.
+  /// Counts the words in a plain text.
   static int countWords(String text) => _wordPattern.allMatches(text).length;
 
-  /// Calcola le statistiche a partire dal testo semplice.
+  /// Computes the statistics from plain text.
   static ReadingStats fromPlainText(
     String text, {
     int wordsPerMinute = defaultWordsPerMinute,
@@ -32,7 +32,7 @@ class ReadingStats {
     );
   }
 
-  /// Calcola le statistiche a partire dal contenuto Markdown del prompt.
+  /// Computes the statistics from the prompt's Markdown content.
   static ReadingStats fromMarkdown(
     String markdown, {
     int wordsPerMinute = defaultWordsPerMinute,
@@ -43,7 +43,9 @@ class ReadingStats {
     );
   }
 
-  /// Tempo di lettura in forma compatta, es. `< 1 min`, `2 min`, `1 h 5 min`.
+  /// Reading time in compact form, e.g. `< 1 min`, `2 min`, `1 h 5 min`. The
+  /// `min`/`h` abbreviations are locale-neutral; the word count is localized in
+  /// the UI (see `readingStatsLabel`).
   String get durationLabel {
     final totalMinutes = duration.inSeconds / 60;
     if (duration.inSeconds == 0) return '0 min';
@@ -53,11 +55,5 @@ class ReadingStats {
     final hours = minutes ~/ 60;
     final rem = minutes % 60;
     return rem == 0 ? '$hours h' : '$hours h $rem min';
-  }
-
-  /// Etichetta combinata, es. `120 parole · ~1 min`.
-  String get label {
-    final plural = wordCount == 1 ? 'parola' : 'parole';
-    return '$wordCount $plural · ~$durationLabel';
   }
 }

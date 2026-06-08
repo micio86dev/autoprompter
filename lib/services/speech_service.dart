@@ -1,23 +1,23 @@
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
-/// Una lingua disponibile per il riconoscimento vocale.
+/// A language available for speech recognition.
 class SpeechLocale {
   const SpeechLocale(this.id, this.name);
   final String id;
   final String name;
 }
 
-/// Contratto del servizio vocale, così il teleprompter può ricevere un'impl.
-/// finta nei test al posto del riconoscimento reale.
+/// Speech service contract, so the teleprompter can receive a fake
+/// implementation in tests instead of the real recognizer.
 abstract class SpeechService {
   bool get isAvailable;
   bool get isListening;
 
-  /// Lingue disponibili sul dispositivo.
+  /// Languages available on the device.
   Future<List<SpeechLocale>> locales();
 
-  /// Avvia l'ascolto continuo. Ritorna false se non disponibile/negato.
+  /// Starts continuous listening. Returns false if unavailable/denied.
   Future<bool> start({
     required String localeId,
     required void Function(List<String> newWords) onWords,
@@ -25,14 +25,14 @@ abstract class SpeechService {
     void Function(String message)? onError,
   });
 
-  /// Ferma l'ascolto.
+  /// Stops listening.
   Future<void> stop();
 
   Future<void> dispose();
 }
 
-/// Implementazione reale basata su `speech_to_text`: ascolto continuo,
-/// riavvio automatico delle sessioni ed emissione delle sole parole nuove.
+/// Real implementation backed by `speech_to_text`: continuous listening,
+/// automatic session restart and emission of only the new words.
 class SttSpeechService implements SpeechService {
   final SpeechToText _stt = SpeechToText();
 
@@ -40,7 +40,7 @@ class SttSpeechService implements SpeechService {
   bool _wantListening = false;
   String _localeId = 'it_IT';
 
-  /// Numero di parole già emesse per la sessione di ascolto corrente.
+  /// Number of words already emitted for the current listening session.
   int _emittedWordCount = 0;
 
   void Function(List<String> newWords)? _onWords;
@@ -52,7 +52,7 @@ class SttSpeechService implements SpeechService {
   @override
   bool get isListening => _stt.isListening;
 
-  /// Inizializza il motore (richiede i permessi di microfono/riconoscimento).
+  /// Initializes the engine (requires microphone/recognition permissions).
   Future<bool> initialize() async {
     if (_available) return true;
     _available = await _stt.initialize(
@@ -89,8 +89,7 @@ class SttSpeechService implements SpeechService {
 
     final ok = await initialize();
     if (!ok) {
-      _onError?.call('Riconoscimento vocale non disponibile su questo '
-          'dispositivo o permesso microfono negato.');
+      // The caller (teleprompter) shows a localized "unavailable" message.
       return false;
     }
 
@@ -134,9 +133,9 @@ class SttSpeechService implements SpeechService {
         .split(RegExp(r'\s+'))
         .where((w) => w.isNotEmpty)
         .toList();
-    // Il riconoscitore a volte rivede l'ipotesi e accorcia il testo: in quel
-    // caso è ripartito da capo, quindi riallineiamo il conteggio per non
-    // perdere le parole successive.
+    // The recognizer sometimes revises its hypothesis and shortens the text: in
+    // that case it has restarted, so we realign the count to avoid losing the
+    // following words.
     if (words.length < _emittedWordCount) {
       _emittedWordCount = 0;
     }
@@ -151,8 +150,8 @@ class SttSpeechService implements SpeechService {
     final listening = status == SpeechToText.listeningStatus;
     _onListeningChanged?.call(listening);
 
-    // Le sessioni native terminano dopo pause/timeout: riavvia se l'utente
-    // vuole ancora ascoltare, così la dettatura è continua.
+    // Native sessions end after pauses/timeouts: restart if the user still
+    // wants to listen, so dictation stays continuous.
     final stopped = status == SpeechToText.doneStatus ||
         status == SpeechToText.notListeningStatus;
     if (stopped && _wantListening) {

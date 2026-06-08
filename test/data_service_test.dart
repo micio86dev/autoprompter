@@ -4,23 +4,24 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('DataService export markdown', () {
-    test('aggiunge il titolo come H1', () {
-      final p = Prompt.create(title: 'Saluto', contentMarkdown: 'Ciao a tutti');
+    test('adds the title as H1', () {
+      final p =
+          Prompt.create(title: 'Greeting', contentMarkdown: 'Hello everyone');
       final out = DataService.promptToMarkdownFile(p);
-      expect(out, '# Saluto\n\nCiao a tutti\n');
+      expect(out, '# Greeting\n\nHello everyone\n');
     });
 
-    test('senza titolo esporta solo il corpo', () {
-      final p = Prompt.create(title: '', contentMarkdown: 'Solo corpo');
-      expect(DataService.promptToMarkdownFile(p), 'Solo corpo\n');
+    test('without a title exports only the body', () {
+      final p = Prompt.create(title: '', contentMarkdown: 'Body only');
+      expect(DataService.promptToMarkdownFile(p), 'Body only\n');
     });
   });
 
   group('DataService backup', () {
-    test('round-trip encode/decode preserva i prompt e i tag', () {
+    test('encode/decode round-trip preserves the prompts and tags', () {
       final prompts = [
         Prompt.create(title: 'A', contentMarkdown: '# A', tags: ['x', 'y']),
-        Prompt.create(title: 'B', contentMarkdown: 'testo'),
+        Prompt.create(title: 'B', contentMarkdown: 'text'),
       ];
       final json = DataService.encodeBackup(prompts);
       final restored = DataService.decodeBackup(json);
@@ -28,18 +29,18 @@ void main() {
       expect(restored[0].title, 'A');
       expect(restored[0].tags, ['x', 'y']);
       expect(restored[0].id, prompts[0].id);
-      expect(restored[1].contentMarkdown, 'testo');
+      expect(restored[1].contentMarkdown, 'text');
     });
 
-    test('decodifica anche una semplice lista di prompt', () {
-      final prompts = [Prompt.create(title: 'Solo')];
+    test('also decodes a plain list of prompts', () {
+      final prompts = [Prompt.create(title: 'Only')];
       final listJson = DataService.encodeBackup(prompts);
-      // estrae l'array e lo passa da solo
+      // extracts the array and passes it on its own
       final restored = DataService.decodeBackup(listJson);
-      expect(restored.single.title, 'Solo');
+      expect(restored.single.title, 'Only');
     });
 
-    test('backup non valido solleva FormatException', () {
+    test('an invalid backup throws FormatException', () {
       expect(() => DataService.decodeBackup('{"foo": 1}'),
           throwsA(isA<FormatException>()));
     });

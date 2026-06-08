@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:provider/provider.dart';
 
 import 'data/prompt_repository.dart';
+import 'l10n/app_localizations.dart';
 import 'screens/prompt_list_screen.dart';
 import 'state/prompt_store.dart';
 import 'state/settings_store.dart';
@@ -39,17 +39,11 @@ class AutoprompterApp extends StatelessWidget {
           return MaterialApp(
             title: 'Autoprompter',
             debugShowCheckedModeBanner: false,
-            locale: const Locale('it'),
             localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
+              ...AppLocalizations.localizationsDelegates,
               FlutterQuillLocalizations.delegate,
             ],
-            supportedLocales: const [
-              Locale('it'),
-              Locale('en'),
-            ],
+            supportedLocales: AppLocalizations.supportedLocales,
             theme: _theme(Brightness.light),
             darkTheme: _theme(Brightness.dark),
             themeMode: settings.themeMode,

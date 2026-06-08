@@ -3,22 +3,20 @@ import 'package:flutter/foundation.dart';
 import '../data/prompt_repository.dart';
 import '../models/prompt.dart';
 
-/// Criteri di ordinamento della lista dei prompt.
+/// Sort criteria for the prompt list. The localized label is resolved in the
+/// UI layer (see `PromptListScreen`), so the enum stays free of display text.
 enum PromptSort {
-  updatedDesc('Modificati di recente'),
-  updatedAsc('Modificati meno di recente'),
-  titleAsc('Titolo A→Z'),
-  titleDesc('Titolo Z→A'),
-  createdDesc('Creati di recente');
-
-  const PromptSort(this.label);
-  final String label;
+  updatedDesc,
+  updatedAsc,
+  titleAsc,
+  titleDesc,
+  createdDesc,
 }
 
-/// Stato condiviso della lista dei prompt, sopra [PromptRepository].
+/// Shared state for the prompt list, layered on top of [PromptRepository].
 ///
-/// Oltre al CRUD gestisce ricerca testuale, filtro per tag e ordinamento; la
-/// lista da mostrare è esposta da [visiblePrompts].
+/// Besides CRUD it handles text search, tag filtering and sorting; the list to
+/// display is exposed by [visiblePrompts].
 class PromptStore extends ChangeNotifier {
   PromptStore(this._repository);
 
@@ -31,7 +29,7 @@ class PromptStore extends ChangeNotifier {
   PromptSort _sort = PromptSort.updatedDesc;
   final Set<String> _activeTags = {};
 
-  /// Tutti i prompt (non filtrati), già ordinati.
+  /// All prompts (unfiltered), already sorted.
   List<Prompt> get prompts => List.unmodifiable(_prompts);
   bool get loading => _loading;
 
@@ -39,11 +37,11 @@ class PromptStore extends ChangeNotifier {
   PromptSort get sort => _sort;
   Set<String> get activeTags => Set.unmodifiable(_activeTags);
 
-  /// I prompt da mostrare, dopo ricerca/filtro/ordinamento.
+  /// The prompts to display, after search/filter/sort.
   List<Prompt> get visiblePrompts =>
       filterAndSort(_prompts, query: _query, tags: _activeTags, sort: _sort);
 
-  /// Tutti i tag presenti tra i prompt, ordinati alfabeticamente.
+  /// All tags present across the prompts, sorted alphabetically.
   List<String> get allTags {
     final set = <String>{};
     for (final p in _prompts) {
@@ -64,7 +62,7 @@ class PromptStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Salva (insert o update) un prompt, aggiornando il timestamp.
+  /// Saves (insert or update) a prompt, refreshing its timestamp.
   Future<Prompt> save(Prompt prompt) async {
     final updated = prompt.copyWith(updatedAt: DateTime.now());
     await _repository.upsert(updated);
@@ -79,10 +77,17 @@ class PromptStore extends ChangeNotifier {
     return updated;
   }
 
-  /// Crea una copia di [prompt] con nuovo id e titolo "… (copia)".
-  Future<Prompt> duplicate(Prompt prompt) async {
+  /// Creates a copy of [prompt] with a new id and a "… (copy)" title.
+  ///
+  /// The localized [copySuffix] (e.g. "(copy)") and [untitledLabel] are passed
+  /// in by the UI layer so the store stays free of display text.
+  Future<Prompt> duplicate(
+    Prompt prompt, {
+    required String copySuffix,
+    required String untitledLabel,
+  }) async {
     final copy = Prompt.create(
-      title: _copyTitle(prompt.title),
+      title: _copyTitle(prompt.title, copySuffix, untitledLabel),
       contentMarkdown: prompt.contentMarkdown,
       localeId: prompt.localeId,
       tags: prompt.tags,
@@ -96,8 +101,8 @@ class PromptStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Ripristina (upsert) un insieme di prompt da un backup e ricarica la lista.
-  /// Ritorna quanti prompt sono stati importati.
+  /// Restores (upserts) a set of prompts from a backup and reloads the list.
+  /// Returns how many prompts were imported.
   Future<int> restore(List<Prompt> prompts) async {
     for (final p in prompts) {
       await _repository.upsert(p);
@@ -106,7 +111,7 @@ class PromptStore extends ChangeNotifier {
     return prompts.length;
   }
 
-  // --- filtri / ordinamento ---
+  // --- filtering / sorting ---
 
   void setQuery(String query) {
     if (query == _query) return;
@@ -132,16 +137,17 @@ class PromptStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  static String _copyTitle(String title) {
-    final base = title.trim().isEmpty ? 'Senza titolo' : title.trim();
-    return '$base (copia)';
+  static String _copyTitle(
+      String title, String copySuffix, String untitledLabel) {
+    final base = title.trim().isEmpty ? untitledLabel : title.trim();
+    return '$base $copySuffix';
   }
 
-  /// Applica ricerca testuale, filtro per tag e ordinamento. Funzione pura,
-  /// così è facilmente testabile.
+  /// Applies text search, tag filtering and sorting. Pure function, so it is
+  /// easy to test.
   ///
-  /// - [query] cerca (case-insensitive) nel titolo, nel contenuto e nei tag.
-  /// - [tags] richiede che il prompt contenga **tutti** i tag indicati.
+  /// - [query] searches (case-insensitive) in the title, content and tags.
+  /// - [tags] requires the prompt to contain **all** the given tags.
   static List<Prompt> filterAndSort(
     List<Prompt> prompts, {
     String query = '',

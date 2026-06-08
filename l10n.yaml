@@ -1,0 +1,8 @@
+# Configuration for Flutter's gen_l10n localization tool.
+# Strings live in lib/l10n/*.arb; AppLocalizations is generated into lib/l10n.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+output-dir: lib/l10n
+nullable-getter: false

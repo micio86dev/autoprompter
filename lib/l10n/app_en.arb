@@ -1,0 +1,130 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Autoprompter",
+  "@appTitle": {
+    "description": "Application name shown in the list screen app bar."
+  },
+
+  "searchPromptsHint": "Search prompts…",
+  "closeSearch": "Close search",
+  "search": "Search",
+  "sortTooltip": "Sort",
+  "menuTooltip": "Menu",
+  "importMarkdown": "Import Markdown…",
+  "backupData": "Back up data…",
+  "restoreBackup": "Restore backup…",
+  "settings": "Settings",
+  "newPrompt": "New prompt",
+  "moreActions": "More actions",
+  "openTeleprompter": "Open teleprompter",
+  "untitled": "Untitled",
+  "edit": "Edit",
+  "duplicate": "Duplicate",
+  "shareMd": "Share (.md)",
+  "delete": "Delete",
+  "cancel": "Cancel",
+
+  "deletePromptTitle": "Delete prompt?",
+  "deletePromptMessage": "Do you want to delete \"{title}\"? This action cannot be undone.",
+  "@deletePromptMessage": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+
+  "promptDuplicated": "Prompt duplicated",
+  "copySuffix": "(copy)",
+
+  "shareFailed": "Sharing failed: {error}",
+  "@shareFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "importFailed": "Import failed: {error}",
+  "@importFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "noPromptsToBackup": "No prompts to back up",
+
+  "backupFailed": "Backup failed: {error}",
+  "@backupFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "promptsRestored": "{count, plural, =1{Restored 1 prompt} other{Restored {count} prompts}}",
+  "@promptsRestored": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "restoreFailed": "Restore failed: {error}",
+  "@restoreFailed": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "noContent": "No content",
+  "noPromptsMatchFilters": "No prompts match the filters",
+  "clearFilters": "Clear filters",
+  "noPrompts": "No prompts",
+  "emptyStateMessage": "Tap \"New prompt\" to create your first script to read on the teleprompter.",
+
+  "sortUpdatedDesc": "Recently edited",
+  "sortUpdatedAsc": "Least recently edited",
+  "sortTitleAsc": "Title A→Z",
+  "sortTitleDesc": "Title Z→A",
+  "sortCreatedDesc": "Recently created",
+
+  "editPrompt": "Edit prompt",
+  "markdownPreview": "Markdown preview",
+  "hidePreview": "Hide preview",
+  "save": "Save",
+  "promptSaved": "Prompt saved",
+  "titleHint": "Title",
+  "voiceLanguage": "Voice language:",
+  "editorPlaceholder": "Write the prompt text here…",
+  "addTagHint": "Add tag…",
+  "emptyMarkdownPreview": "_(empty)_",
+
+  "appearance": "Appearance",
+  "theme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystemSubtitle": "Follow the system",
+  "teleprompterDefaults": "Teleprompter (defaults)",
+  "textSize": "Text size",
+  "autoscrollSpeed": "Autoscroll speed",
+  "readingLinePosition": "Reading line position",
+
+  "decreaseText": "Decrease text",
+  "increaseText": "Increase text",
+  "restart": "Restart",
+  "readingSettings": "Reading settings",
+  "mirrorHorizontal": "Horizontal mirror",
+  "mirrorHorizontalSubtitle": "For the teleprompter glass",
+  "mirrorVertical": "Vertical mirror",
+  "emptyPromptMessage": "This prompt is empty. Edit it to add some text.",
+  "stop": "Stop",
+  "startReading": "Start reading",
+  "speechUnavailable": "Speech recognition is unavailable on this device or microphone permission was denied.",
+
+  "readingStatsLabel": "{count, plural, =1{1 word} other{{count} words}} · ~{time}",
+  "@readingStatsLabel": {
+    "description": "Word count and estimated reading time shown under the editor.",
+    "placeholders": {
+      "count": { "type": "int" },
+      "time": { "type": "String" }
+    }
+  }
+}

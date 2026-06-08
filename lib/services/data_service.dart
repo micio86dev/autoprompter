@@ -8,28 +8,28 @@ import 'package:share_plus/share_plus.dart';
 
 import '../models/prompt.dart';
 
-/// Risultato di un ripristino da backup.
+/// Result of a restore from backup.
 class RestoreResult {
   const RestoreResult({required this.prompts});
   final List<Prompt> prompts;
   int get count => prompts.length;
 }
 
-/// Import/export dei prompt: condivisione come file `.md`, importazione di
-/// Markdown esistente e backup/ripristino JSON di tutti i dati locali.
+/// Prompt import/export: sharing as `.md` files, importing existing Markdown,
+/// and JSON backup/restore of all local data.
 class DataService {
   DataService._();
   static final DataService instance = DataService._();
 
   static const int backupVersion = 1;
 
-  /// Estensioni accettate per l'importazione di testo.
+  /// Extensions accepted when importing text.
   static const List<String> markdownExtensions = ['md', 'markdown', 'txt'];
 
-  /// Estensioni accettate per il ripristino del backup.
+  /// Extensions accepted when restoring a backup.
   static const List<String> backupExtensions = ['json', 'txt'];
 
-  /// Condivide un prompt come file `.md` tramite il foglio di condivisione.
+  /// Shares a prompt as a `.md` file through the share sheet.
   Future<void> sharePrompt(Prompt prompt) async {
     final fileName = '${_safeFileName(prompt.title)}.md';
     final dir = await getTemporaryDirectory();
@@ -43,8 +43,8 @@ class DataService {
     );
   }
 
-  /// Importa un file Markdown scelto dall'utente e lo trasforma in un nuovo
-  /// [Prompt] (non ancora salvato). Ritorna null se l'utente annulla.
+  /// Imports a Markdown file chosen by the user and turns it into a new
+  /// [Prompt] (not yet saved). Returns null if the user cancels.
   Future<Prompt?> importMarkdown() async {
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
@@ -59,7 +59,7 @@ class DataService {
     return Prompt.create(title: title, contentMarkdown: content.trim());
   }
 
-  /// Crea un backup JSON di tutti i [prompts] e lo condivide come file.
+  /// Creates a JSON backup of all [prompts] and shares it as a file.
   Future<void> backup(List<Prompt> prompts) async {
     final dir = await getTemporaryDirectory();
     final file = File(p.join(dir.path, 'autoprompter-backup.json'));
@@ -67,13 +67,13 @@ class DataService {
     await SharePlus.instance.share(
       ShareParams(
         files: [XFile(file.path, mimeType: 'application/json')],
-        subject: 'Backup Autoprompter',
+        subject: 'Autoprompter backup',
       ),
     );
   }
 
-  /// Ripristina i prompt da un file di backup scelto dall'utente.
-  /// Ritorna null se l'utente annulla.
+  /// Restores the prompts from a backup file chosen by the user.
+  /// Returns null if the user cancels.
   Future<RestoreResult?> restore() async {
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
@@ -86,9 +86,9 @@ class DataService {
     return RestoreResult(prompts: decodeBackup(content));
   }
 
-  // --- logica pura (testabile) ---
+  // --- pure logic (testable) ---
 
-  /// Contenuto del file `.md` esportato: titolo come H1 + corpo Markdown.
+  /// Exported `.md` file content: title as H1 + Markdown body.
   static String promptToMarkdownFile(Prompt prompt) {
     final body = prompt.contentMarkdown.trim();
     final title = prompt.title.trim();
@@ -96,7 +96,7 @@ class DataService {
     return '# $title\n\n$body\n';
   }
 
-  /// Serializza una lista di prompt nel formato di backup.
+  /// Serializes a list of prompts into the backup format.
   static String encodeBackup(List<Prompt> prompts) {
     final map = {
       'app': 'autoprompter',
@@ -106,8 +106,8 @@ class DataService {
     return const JsonEncoder.withIndent('  ').convert(map);
   }
 
-  /// Deserializza un backup, tollerando sia il formato con involucro
-  /// (`{"prompts": [...]}`) sia una semplice lista di prompt.
+  /// Deserializes a backup, tolerating both the wrapped format
+  /// (`{"prompts": [...]}`) and a plain list of prompts.
   static List<Prompt> decodeBackup(String content) {
     final decoded = jsonDecode(content);
     final List rawPrompts;
@@ -116,7 +116,7 @@ class DataService {
     } else if (decoded is List) {
       rawPrompts = decoded;
     } else {
-      throw const FormatException('Backup non valido');
+      throw const FormatException('Invalid backup');
     }
     return rawPrompts
         .whereType<Map>()
@@ -124,8 +124,8 @@ class DataService {
         .toList();
   }
 
-  /// Ricava un titolo dal Markdown: prima riga `# Titolo`, altrimenti la prima
-  /// riga non vuota, altrimenti il nome del file senza estensione.
+  /// Derives a title from the Markdown: first `# Title` line, otherwise the
+  /// first non-empty line, otherwise the file name without extension.
   static String _titleFromMarkdown(String content, {required String fallback}) {
     for (final line in const LineSplitter().convert(content)) {
       final trimmed = line.trim();

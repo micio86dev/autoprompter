@@ -3,98 +3,98 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('WordMatcher tokenization', () {
-    test('conta correttamente le parole', () {
-      final m = WordMatcher('Ciao mondo, come va?');
-      expect(m.wordCount, 4); // Ciao, mondo, come, va
+    test('counts words correctly', () {
+      final m = WordMatcher('Hello world, how are you?');
+      expect(m.wordCount, 5); // Hello, world, how, are, you
     });
 
-    test('conserva i separatori nei segmenti', () {
+    test('keeps the separators in the segments', () {
       final m = WordMatcher('a b');
       final rebuilt = m.segments.map((s) => s.text).join();
       expect(rebuilt, 'a b');
       expect(m.segments.where((s) => s.isWord).length, 2);
     });
 
-    test('gestisce le parole con apostrofo come un unico token', () {
-      final m = WordMatcher("l'altro giorno");
-      expect(m.wordCount, 2);
+    test('treats words with an apostrophe as a single token', () {
+      final m = WordMatcher("the other's day");
+      expect(m.wordCount, 3);
     });
   });
 
-  group('WordMatcher avanzamento', () {
-    test('parte da -1', () {
-      final m = WordMatcher('uno due tre');
+  group('WordMatcher advancing', () {
+    test('starts at -1', () {
+      final m = WordMatcher('one two three');
       expect(m.currentIndex, -1);
       expect(m.matchedCount, 0);
     });
 
-    test('avanza con parole esatte in sequenza', () {
-      final m = WordMatcher('uno due tre quattro');
-      m.consume(['uno']);
+    test('advances on exact words in sequence', () {
+      final m = WordMatcher('one two three four');
+      m.consume(['one']);
       expect(m.currentIndex, 0);
-      m.consume(['due', 'tre']);
+      m.consume(['two', 'three']);
       expect(m.currentIndex, 2);
     });
 
-    test('salta una parola entro la finestra', () {
-      final m = WordMatcher('alfa beta gamma delta');
-      m.consume(['alfa']);
-      // Salta "beta" e dice direttamente "gamma".
+    test('skips a word within the window', () {
+      final m = WordMatcher('alpha beta gamma delta');
+      m.consume(['alpha']);
+      // Skips "beta" and says "gamma" directly.
       m.consume(['gamma']);
       expect(m.currentIndex, 2);
     });
 
-    test('ignora parole non presenti senza arretrare', () {
-      final m = WordMatcher('uno due tre');
-      m.consume(['uno']);
+    test('ignores absent words without going backward', () {
+      final m = WordMatcher('one two three');
+      m.consume(['one']);
       m.consume(['xyzqwerty']);
       expect(m.currentIndex, 0);
     });
 
-    test('tollera piccoli errori di riconoscimento (Levenshtein)', () {
-      final m = WordMatcher('benvenuto teleprompter');
-      // "telepromter" -> "teleprompter" (1 carattere di differenza)
-      m.consume(['benvenuto', 'telepromter']);
+    test('tolerates small recognition errors (Levenshtein)', () {
+      final m = WordMatcher('welcome teleprompter');
+      // "telepromter" -> "teleprompter" (1 character difference)
+      m.consume(['welcome', 'telepromter']);
       expect(m.currentIndex, 1);
     });
 
-    test('è insensibile ad accenti e maiuscole', () {
-      final m = WordMatcher('Perché però');
-      m.consume(['perche', 'pero']);
+    test('is insensitive to accents and case', () {
+      final m = WordMatcher('Café résumé');
+      m.consume(['cafe', 'resume']);
       expect(m.currentIndex, 1);
     });
 
-    test('corrispondenza per prefisso (risultati parziali)', () {
-      final m = WordMatcher('registrazione completata');
+    test('prefix match (partial results)', () {
+      final m = WordMatcher('registration completed');
       m.consume(['regist']);
       expect(m.currentIndex, 0);
     });
 
-    test('progress e reset', () {
-      final m = WordMatcher('uno due tre quattro');
-      m.consume(['uno', 'due']);
+    test('progress and reset', () {
+      final m = WordMatcher('one two three four');
+      m.consume(['one', 'two']);
       expect(m.progress, closeTo(0.5, 0.0001));
       m.reset();
       expect(m.currentIndex, -1);
       expect(m.progress, 0);
     });
 
-    test('non supera la fine del testo', () {
-      final m = WordMatcher('uno due');
-      m.consume(['uno', 'due', 'tre', 'quattro']);
+    test('does not go past the end of the text', () {
+      final m = WordMatcher('one two');
+      m.consume(['one', 'two', 'three', 'four']);
       expect(m.currentIndex, 1);
     });
 
-    test('setCurrentWordIndex riposiziona e poi prosegue da lì', () {
-      final m = WordMatcher('uno due tre quattro cinque');
-      m.setCurrentWordIndex(2); // tap su "tre"
+    test('setCurrentWordIndex repositions and then continues from there', () {
+      final m = WordMatcher('one two three four five');
+      m.setCurrentWordIndex(2); // tap on "three"
       expect(m.currentIndex, 2);
-      m.consume(['quattro']);
+      m.consume(['four']);
       expect(m.currentIndex, 3);
     });
 
-    test('setCurrentWordIndex limita ai bordi', () {
-      final m = WordMatcher('uno due tre');
+    test('setCurrentWordIndex clamps to the bounds', () {
+      final m = WordMatcher('one two three');
       m.setCurrentWordIndex(99);
       expect(m.currentIndex, 2);
       m.setCurrentWordIndex(-5);
@@ -102,55 +102,55 @@ void main() {
     });
   });
 
-  group('WordMatcher robustezza (lettura imperfetta)', () {
-    // 40 parole distinte (niente collisioni di Levenshtein).
-    // Indici: 0 mela ... 20 rosso ... 30 lunedi ... 35 sabato ... 39 marzo
+  group('WordMatcher robustness (imperfect reading)', () {
+    // 40 distinct words (no Levenshtein collisions).
+    // Indices: 0 apple ... 20 crimson ... 30 monday ... 35 saturday ... 39 march
     const text =
-        'mela banana ciliegia fragola arancia limone pesca uva kiwi melone '
-        'cane gatto cavallo coniglio tartaruga delfino aquila falco lupo volpe '
-        'rosso verde blu giallo viola arancione marrone grigio celeste indaco '
-        'lunedi martedi mercoledi giovedi venerdi sabato domenica gennaio febbraio marzo';
+        'apple banana cherry strawberry orange lemon peach grape kiwi melon '
+        'dog cat horse rabbit turtle dolphin eagle hawk wolf squirrel '
+        'crimson olive azure amber violet maroon teal silver beige indigo '
+        'monday tuesday wednesday thursday friday saturday sunday january february march';
 
-    test('recupera dopo un salto oltre la finestra (ricerca globale)', () {
+    test('recovers after a jump beyond the window (global search)', () {
       final m = WordMatcher(text);
-      m.consume(['mela', 'banana', 'ciliegia']);
+      m.consume(['apple', 'banana', 'cherry']);
       expect(m.currentIndex, 2);
-      // Salta avanti di oltre 30 parole e legge da lì: si riaggancia.
-      m.consume(['giovedi', 'venerdi', 'sabato']);
+      // Jumps ahead by more than 30 words and reads from there: it re-syncs.
+      m.consume(['thursday', 'friday', 'saturday']);
       expect(m.currentIndex, 35);
     });
 
-    test('riparte dopo una pausa in un punto diverso', () {
+    test('restarts after a pause at a different point', () {
       final m = WordMatcher(text);
-      m.consume(['mela', 'banana']);
-      m.consume(['rosso', 'verde', 'blu']);
+      m.consume(['apple', 'banana']);
+      m.consume(['crimson', 'olive', 'azure']);
       expect(m.currentIndex, 22);
     });
 
-    test('le parole fuori copione non bloccano né spostano il cursore', () {
+    test('off-script words do not block or move the cursor', () {
       final m = WordMatcher(text);
-      m.consume(['mela', 'banana']);
-      m.consume(['ehm', 'aspetta', 'dunque']); // intercalari assenti dal testo
+      m.consume(['apple', 'banana']);
+      m.consume(['um', 'wait', 'so']); // fillers absent from the text
       expect(m.currentIndex, 1);
-      m.consume(['ciliegia']); // riprende normalmente
+      m.consume(['cherry']); // resumes normally
       expect(m.currentIndex, 2);
     });
 
-    test('continua nonostante una parola cambiata', () {
+    test('continues despite a changed word', () {
       final m = WordMatcher(text);
-      m.consume(['mela', 'banana']);
-      m.consume(['pippo']); // doveva essere "ciliegia"
-      m.consume(['fragola', 'arancia']);
+      m.consume(['apple', 'banana']);
+      m.consume(['foobar']); // should have been "cherry"
+      m.consume(['strawberry', 'orange']);
       expect(m.currentIndex, 4);
     });
 
-    test('recupera se il cursore era finito troppo avanti', () {
+    test('recovers if the cursor had jumped too far ahead', () {
       final m = WordMatcher(text);
-      // Cursore spinto avanti per errore.
-      m.consume(['lunedi', 'martedi', 'mercoledi']);
+      // Cursor pushed ahead by mistake.
+      m.consume(['monday', 'tuesday', 'wednesday']);
       expect(m.currentIndex, 32);
-      // In realtà si stava leggendo dall'inizio: deve tornare indietro.
-      m.consume(['mela', 'banana', 'ciliegia']);
+      // The reader was actually at the start: it must go back.
+      m.consume(['apple', 'banana', 'cherry']);
       expect(m.currentIndex, 2);
     });
   });

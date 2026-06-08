@@ -3,54 +3,54 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('MarkdownService', () {
-    test('estrae testo semplice rimuovendo la formattazione', () {
+    test('extracts plain text stripping the formatting', () {
       final plain = MarkdownService.markdownToPlainText(
-          '# Titolo\n\nUn **testo** in _corsivo_.');
-      expect(plain.contains('Titolo'), isTrue);
-      expect(plain.contains('Un testo in corsivo.'), isTrue);
+          '# Title\n\nA **text** in _italic_.');
+      expect(plain.contains('Title'), isTrue);
+      expect(plain.contains('A text in italic.'), isTrue);
       expect(plain.contains('**'), isFalse);
       expect(plain.contains('#'), isFalse);
     });
 
-    test('round-trip Markdown -> Delta -> Markdown conserva il testo', () {
-      const md = '# Titolo\n\nPrimo paragrafo con **grassetto**.';
+    test('round-trip Markdown -> Delta -> Markdown keeps the text', () {
+      const md = '# Title\n\nFirst paragraph with **bold**.';
       final delta = MarkdownService.markdownToDelta(md);
       final back = MarkdownService.deltaToMarkdown(delta);
-      // Il testo visibile sopravvive al round-trip.
+      // The visible text survives the round-trip.
       final plain = MarkdownService.markdownToPlainText(back);
-      expect(plain.contains('Titolo'), isTrue);
-      expect(plain.contains('Primo paragrafo con grassetto.'), isTrue);
-      // I marcatori di grassetto e titolo sono ancora presenti.
+      expect(plain.contains('Title'), isTrue);
+      expect(plain.contains('First paragraph with bold.'), isTrue);
+      // The bold and heading markers are still present.
       expect(back.contains('#'), isTrue);
       expect(back.contains('*'), isTrue);
     });
 
-    test('gestisce gli elenchi puntati', () {
-      const md = '- uno\n- due\n- tre';
+    test('handles bullet lists', () {
+      const md = '- one\n- two\n- three';
       final delta = MarkdownService.markdownToDelta(md);
       final back = MarkdownService.deltaToMarkdown(delta);
       final plain = MarkdownService.markdownToPlainText(back);
-      expect(plain.contains('uno'), isTrue);
-      expect(plain.contains('due'), isTrue);
-      expect(plain.contains('tre'), isTrue);
+      expect(plain.contains('one'), isTrue);
+      expect(plain.contains('two'), isTrue);
+      expect(plain.contains('three'), isTrue);
     });
 
-    test('contenuto vuoto produce testo vuoto', () {
+    test('empty content produces empty text', () {
       expect(MarkdownService.markdownToPlainText(''), '');
       expect(MarkdownService.markdownToPlainText('   '), '');
     });
 
-    test('conserva i link nel round-trip', () {
-      const md = 'Vai su [il sito](https://example.com) ora.';
+    test('keeps links in the round-trip', () {
+      const md = 'Go to [the site](https://example.com) now.';
       final back =
           MarkdownService.deltaToMarkdown(MarkdownService.markdownToDelta(md));
       expect(back.contains('https://example.com'), isTrue);
-      expect(back.contains('il sito'), isTrue);
+      expect(back.contains('the site'), isTrue);
       expect(back.contains(']('), isTrue);
     });
 
-    test('conserva il codice inline nel round-trip', () {
-      const md = 'Usa il comando `flutter run` adesso.';
+    test('keeps inline code in the round-trip', () {
+      const md = 'Use the `flutter run` command now.';
       final back =
           MarkdownService.deltaToMarkdown(MarkdownService.markdownToDelta(md));
       expect(back.contains('`flutter run`'), isTrue);

@@ -13,7 +13,7 @@ Prompt _p({
     id: title,
     title: title,
     contentMarkdown: content,
-    localeId: 'it_IT',
+    localeId: 'en_US',
     createdAt: DateTime.fromMillisecondsSinceEpoch(created),
     updatedAt: DateTime.fromMillisecondsSinceEpoch(updated),
     tags: tags,
@@ -22,51 +22,51 @@ Prompt _p({
 
 void main() {
   final prompts = [
-    _p(title: 'Intro', content: 'benvenuti alla demo', tags: ['lavoro'], updated: 300, created: 100),
-    _p(title: 'Chiusura', content: 'grazie a tutti', tags: ['lavoro', 'demo'], updated: 100, created: 300),
-    _p(title: 'Appunti', content: 'lista della spesa', tags: ['personale'], updated: 200, created: 200),
+    _p(title: 'Intro', content: 'welcome to the demo', tags: ['work'], updated: 300, created: 100),
+    _p(title: 'Closing', content: 'thanks everyone', tags: ['work', 'demo'], updated: 100, created: 300),
+    _p(title: 'Notes', content: 'shopping list', tags: ['personal'], updated: 200, created: 200),
   ];
 
   group('PromptStore.filterAndSort', () {
-    test('ricerca nel titolo (case-insensitive)', () {
+    test('searches in the title (case-insensitive)', () {
       final r = PromptStore.filterAndSort(prompts, query: 'intro');
       expect(r.map((p) => p.title), ['Intro']);
     });
 
-    test('ricerca nel contenuto', () {
-      final r = PromptStore.filterAndSort(prompts, query: 'spesa');
-      expect(r.map((p) => p.title), ['Appunti']);
+    test('searches in the content', () {
+      final r = PromptStore.filterAndSort(prompts, query: 'shopping');
+      expect(r.map((p) => p.title), ['Notes']);
     });
 
-    test('ricerca nei tag', () {
-      final r = PromptStore.filterAndSort(prompts, query: 'personale');
-      expect(r.map((p) => p.title), ['Appunti']);
+    test('searches in the tags', () {
+      final r = PromptStore.filterAndSort(prompts, query: 'personal');
+      expect(r.map((p) => p.title), ['Notes']);
     });
 
-    test('filtro per tag richiede tutti i tag', () {
-      final r = PromptStore.filterAndSort(prompts, tags: {'lavoro', 'demo'});
-      expect(r.map((p) => p.title), ['Chiusura']);
+    test('tag filter requires all tags', () {
+      final r = PromptStore.filterAndSort(prompts, tags: {'work', 'demo'});
+      expect(r.map((p) => p.title), ['Closing']);
     });
 
-    test('ordinamento per titolo A→Z', () {
+    test('sort by title A→Z', () {
       final r = PromptStore.filterAndSort(prompts, sort: PromptSort.titleAsc);
-      expect(r.map((p) => p.title), ['Appunti', 'Chiusura', 'Intro']);
+      expect(r.map((p) => p.title), ['Closing', 'Intro', 'Notes']);
     });
 
-    test('ordinamento per modifica recente (default)', () {
+    test('sort by recently updated (default)', () {
       final r = PromptStore.filterAndSort(prompts);
       expect(r.first.title, 'Intro');
-      expect(r.last.title, 'Chiusura');
+      expect(r.last.title, 'Closing');
     });
 
-    test('ordinamento per creazione recente', () {
+    test('sort by recently created', () {
       final r = PromptStore.filterAndSort(prompts, sort: PromptSort.createdDesc);
-      expect(r.first.title, 'Chiusura');
+      expect(r.first.title, 'Closing');
     });
 
-    test('query + tag combinati', () {
-      final r = PromptStore.filterAndSort(prompts, query: 'grazie', tags: {'lavoro'});
-      expect(r.map((p) => p.title), ['Chiusura']);
+    test('query + tag combined', () {
+      final r = PromptStore.filterAndSort(prompts, query: 'thanks', tags: {'work'});
+      expect(r.map((p) => p.title), ['Closing']);
     });
   });
 }

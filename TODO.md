@@ -1,32 +1,33 @@
-# TODO — Funzionalità future
+# TODO — Future features
 
-> Tutte le voci elencate qui sono state **implementate**. La sezione è
-> conservata come storico; aggiungi sotto nuove idee per le prossime versioni.
+> All the items listed here have been **implemented**. The section is kept as a
+> history; add new ideas for upcoming versions below.
 
 ## Teleprompter
-- [x] **Modalità specchio** (flip orizzontale/verticale) per l'uso con vetro da teleprompter.
-- [x] **Scroll automatico a velocità costante** come alternativa/integrazione alla voce (con regolazione velocità).
-- [x] **Regolazione velocità di scroll manuale** e margine/posizione della "riga di lettura".
-- [x] **Tap su una parola** per riposizionare manualmente il punto di lettura.
-- [x] Conteggio parole / tempo di lettura stimato.
+- [x] **Mirror mode** (horizontal/vertical flip) for use with a teleprompter glass.
+- [x] **Constant-speed autoscroll** as an alternative/complement to the voice (with speed adjustment).
+- [x] **Manual scroll-speed adjustment** and margin/position of the "reading line".
+- [x] **Tap a word** to manually reposition the reading point.
+- [x] Word count / estimated reading time.
 
-## Gestione testi
-- [x] **Esportazione/condivisione** dei prompt (file `.md` o condivisione di sistema).
-- [x] **Importazione** di file Markdown esistenti.
-- [x] **Duplica** prompt.
-- [x] Ricerca e ordinamento nella lista.
-- [x] Cartelle/tag per organizzare i prompt. _(implementato come tag + filtro)_
+## Script management
+- [x] **Export/share** prompts (`.md` file or system share sheet).
+- [x] **Import** existing Markdown files.
+- [x] **Duplicate** prompt.
+- [x] Search and sorting in the list.
+- [x] Folders/tags to organize prompts. _(implemented as tags + filter)_
 
 ## Editor
-- [x] Anteprima Markdown affiancata.
-- [x] Formattazione estesa opzionale (link, codice) mantenendo il salvataggio in Markdown.
+- [x] Side-by-side Markdown preview.
+- [x] Optional extended formatting (links, code) while keeping Markdown saving.
 
-## Qualità / piattaforma
-- [x] Test widget end-to-end (con mock di storage e voce).
-- [x] Tema scuro per l'intera app (oltre alla vista teleprompter).
-- [x] Backup/ripristino dei dati locali.
+## Quality / platform
+- [x] End-to-end widget tests (with storage and voice mocks).
+- [x] Dark theme for the whole app (beyond the teleprompter view).
+- [x] Backup/restore of local data.
+- [x] Multilingual UI (English/Italian) via `gen_l10n` internationalization.
 
-## Idee per il futuro
-- [ ] Cartelle gerarchiche (oltre ai tag piatti).
-- [ ] Sincronizzazione cloud opzionale dei prompt.
-- [ ] Anteprima Markdown renderizzata (non solo sorgente) accanto all'editor.
+## Future ideas
+- [ ] Hierarchical folders (beyond flat tags).
+- [ ] Optional cloud sync of prompts.
+- [ ] Rendered Markdown preview (not just source) next to the editor.

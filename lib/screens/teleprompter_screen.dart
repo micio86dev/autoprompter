@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/prompt.dart';
 import '../services/markdown_service.dart';
 import '../services/speech_service.dart';
 import '../services/word_matcher.dart';
 import '../widgets/teleprompter_text.dart';
 
-/// Vista di lettura: mostra il prompt e fa autoscroll seguendo la voce oppure
-/// a velocità costante. Supporta modalità specchio, riga di lettura regolabile
-/// e tap su una parola per riposizionare il punto di lettura.
+/// Reading view: shows the prompt and autoscrolls either following the voice or
+/// at a constant speed. Supports mirror mode, an adjustable reading line and
+/// tapping a word to reposition the reading point.
 class TeleprompterScreen extends StatefulWidget {
   const TeleprompterScreen({
     super.key,
@@ -22,7 +23,7 @@ class TeleprompterScreen extends StatefulWidget {
 
   final Prompt prompt;
 
-  /// Iniettabile nei test; di default usa il riconoscimento vocale reale.
+  /// Injectable in tests; defaults to the real speech recognizer.
   final SpeechService? speech;
 
   final double initialFontSize;
@@ -49,7 +50,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
 
   late double _fontSize;
   late double _scrollSpeed; // px/s in autoscroll
-  late double _readingLine; // 0..1, frazione dell'altezza visibile
+  late double _readingLine; // 0..1, fraction of the visible height
   bool _autoScroll = false;
   bool _flipH = false;
   bool _flipV = false;
@@ -74,13 +75,14 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
     super.dispose();
   }
 
-  // --- voce ---
+  // --- voice ---
 
   Future<void> _toggleListening() async {
     if (_listening) {
       await _speech.stop();
       return;
     }
+    final l10n = AppLocalizations.of(context);
     setState(() => _message = null);
     final ok = await _speech.start(
       localeId: widget.prompt.localeId,
@@ -93,7 +95,10 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
       },
     );
     if (!ok && mounted) {
-      setState(() => _listening = false);
+      setState(() {
+        _listening = false;
+        _message = l10n.speechUnavailable;
+      });
     }
   }
 
@@ -101,7 +106,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
     final changed = _matcher.consume(words);
     if (changed && mounted) {
       setState(() => _currentIndex = _matcher.currentIndex);
-      // In autoscroll lo scorrimento è guidato dal timer, non dalla voce.
+      // In autoscroll, scrolling is driven by the timer, not by the voice.
       if (!_autoScroll) _scrollToCurrent();
     }
   }
@@ -126,7 +131,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
     });
   }
 
-  // --- autoscroll a velocità costante ---
+  // --- constant-speed autoscroll ---
 
   void _toggleAutoScroll() {
     setState(() => _autoScroll = !_autoScroll);
@@ -152,7 +157,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
     }
   }
 
-  // --- controlli ---
+  // --- controls ---
 
   void _reset() {
     _matcher.reset();
@@ -169,6 +174,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
   }
 
   void _openControls() {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF1A1A1A),
@@ -188,31 +194,31 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Impostazioni lettura',
-                        style: TextStyle(
+                    Text(l10n.readingSettings,
+                        style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Specchio orizzontale',
-                          style: TextStyle(color: Colors.white)),
-                      subtitle: const Text('Per il vetro del teleprompter',
-                          style: TextStyle(color: Colors.white54)),
+                      title: Text(l10n.mirrorHorizontal,
+                          style: const TextStyle(color: Colors.white)),
+                      subtitle: Text(l10n.mirrorHorizontalSubtitle,
+                          style: const TextStyle(color: Colors.white54)),
                       value: _flipH,
                       onChanged: (v) => update(() => _flipH = v),
                     ),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Specchio verticale',
-                          style: TextStyle(color: Colors.white)),
+                      title: Text(l10n.mirrorVertical,
+                          style: const TextStyle(color: Colors.white)),
                       value: _flipV,
                       onChanged: (v) => update(() => _flipV = v),
                     ),
                     const Divider(color: Colors.white24),
                     _SliderTile(
-                      label: 'Dimensione testo',
+                      label: l10n.textSize,
                       value: _fontSize,
                       min: 18,
                       max: 72,
@@ -220,7 +226,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
                       onChanged: (v) => update(() => _fontSize = v),
                     ),
                     _SliderTile(
-                      label: 'Velocità autoscroll',
+                      label: l10n.autoscrollSpeed,
                       value: _scrollSpeed,
                       min: 10,
                       max: 200,
@@ -228,7 +234,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
                       onChanged: (v) => update(() => _scrollSpeed = v),
                     ),
                     _SliderTile(
-                      label: 'Posizione riga di lettura',
+                      label: l10n.readingLinePosition,
                       value: _readingLine,
                       min: 0.1,
                       max: 0.6,
@@ -247,6 +253,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final empty = _matcher.wordCount == 0;
     return Scaffold(
       backgroundColor: Colors.black,
@@ -254,27 +261,27 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         title: Text(
-          widget.prompt.title.isEmpty ? 'Senza titolo' : widget.prompt.title,
+          widget.prompt.title.isEmpty ? l10n.untitled : widget.prompt.title,
           overflow: TextOverflow.ellipsis,
         ),
         actions: [
           IconButton(
-            tooltip: 'Riduci testo',
+            tooltip: l10n.decreaseText,
             icon: const Icon(Icons.text_decrease),
             onPressed: () => _changeFont(-2),
           ),
           IconButton(
-            tooltip: 'Ingrandisci testo',
+            tooltip: l10n.increaseText,
             icon: const Icon(Icons.text_increase),
             onPressed: () => _changeFont(2),
           ),
           IconButton(
-            tooltip: 'Ricomincia',
+            tooltip: l10n.restart,
             icon: const Icon(Icons.restart_alt),
             onPressed: _reset,
           ),
           IconButton(
-            tooltip: 'Impostazioni lettura',
+            tooltip: l10n.readingSettings,
             icon: const Icon(Icons.tune),
             onPressed: _openControls,
           ),
@@ -300,13 +307,14 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
             ),
           Expanded(
             child: empty
-                ? const Center(
+                ? Center(
                     child: Padding(
-                      padding: EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(24),
                       child: Text(
-                        'Questo prompt è vuoto. Modificalo per aggiungere del testo.',
+                        l10n.emptyPromptMessage,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white70, fontSize: 18),
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 18),
                       ),
                     ),
                   )
@@ -334,7 +342,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
     return Stack(
       children: [
         Positioned.fill(child: mirrored),
-        // Guida orizzontale della riga di lettura (non specchiata).
+        // Horizontal guide for the reading line (not mirrored).
         Positioned(
           left: 0,
           right: 0,
@@ -363,6 +371,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
   }
 
   Widget _buildControls() {
+    final l10n = AppLocalizations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -380,14 +389,14 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
           foregroundColor: Colors.black,
           onPressed: _toggleListening,
           icon: Icon(_listening ? Icons.stop : Icons.mic),
-          label: Text(_listening ? 'Ferma' : 'Avvia lettura'),
+          label: Text(_listening ? l10n.stop : l10n.startReading),
         ),
       ],
     );
   }
 }
 
-/// Riga con etichetta, valore corrente e slider, in stile scuro.
+/// Row with a label, current value and slider, in a dark style.
 class _SliderTile extends StatelessWidget {
   const _SliderTile({
     required this.label,

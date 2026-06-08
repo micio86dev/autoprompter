@@ -1,40 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../state/settings_store.dart';
 
-/// Impostazioni dell'app: tema e valori predefiniti del teleprompter.
+/// App settings: theme and teleprompter defaults.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final settings = context.watch<SettingsStore>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Impostazioni')),
+      appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         children: [
-          const _SectionHeader('Aspetto'),
+          _SectionHeader(l10n.appearance),
           ListTile(
-            title: const Text('Tema'),
-            subtitle: Text(_themeLabel(settings.themeMode)),
+            title: Text(l10n.theme),
+            subtitle: Text(_themeLabel(l10n, settings.themeMode)),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: SegmentedButton<ThemeMode>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                     value: ThemeMode.system,
-                    label: Text('Sistema'),
-                    icon: Icon(Icons.brightness_auto)),
+                    label: Text(l10n.themeSystem),
+                    icon: const Icon(Icons.brightness_auto)),
                 ButtonSegment(
                     value: ThemeMode.light,
-                    label: Text('Chiaro'),
-                    icon: Icon(Icons.light_mode)),
+                    label: Text(l10n.themeLight),
+                    icon: const Icon(Icons.light_mode)),
                 ButtonSegment(
                     value: ThemeMode.dark,
-                    label: Text('Scuro'),
-                    icon: Icon(Icons.dark_mode)),
+                    label: Text(l10n.themeDark),
+                    icon: const Icon(Icons.dark_mode)),
               ],
               selected: {settings.themeMode},
               onSelectionChanged: (s) => settings.setThemeMode(s.first),
@@ -42,9 +44,9 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Divider(),
-          const _SectionHeader('Teleprompter (valori predefiniti)'),
+          _SectionHeader(l10n.teleprompterDefaults),
           _SettingSlider(
-            label: 'Dimensione testo',
+            label: l10n.textSize,
             value: settings.defaultFontSize,
             min: 18,
             max: 72,
@@ -52,7 +54,7 @@ class SettingsScreen extends StatelessWidget {
             onChanged: settings.setDefaultFontSize,
           ),
           _SettingSlider(
-            label: 'Velocità autoscroll',
+            label: l10n.autoscrollSpeed,
             value: settings.defaultScrollSpeed,
             min: 10,
             max: 200,
@@ -60,7 +62,7 @@ class SettingsScreen extends StatelessWidget {
             onChanged: settings.setDefaultScrollSpeed,
           ),
           _SettingSlider(
-            label: 'Posizione riga di lettura',
+            label: l10n.readingLinePosition,
             value: settings.defaultReadingLine,
             min: 0.1,
             max: 0.6,
@@ -72,10 +74,11 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  static String _themeLabel(ThemeMode mode) => switch (mode) {
-        ThemeMode.system => 'Segui il sistema',
-        ThemeMode.light => 'Chiaro',
-        ThemeMode.dark => 'Scuro',
+  static String _themeLabel(AppLocalizations l10n, ThemeMode mode) =>
+      switch (mode) {
+        ThemeMode.system => l10n.themeSystemSubtitle,
+        ThemeMode.light => l10n.themeLight,
+        ThemeMode.dark => l10n.themeDark,
       };
 }
 

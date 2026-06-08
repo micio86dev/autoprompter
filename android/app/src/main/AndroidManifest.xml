@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Riconoscimento vocale per il teleprompter -->
+    <!-- Speech recognition for the teleprompter -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
@@ -44,7 +44,7 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-        <!-- Necessario su Android 11+ per usare il servizio di riconoscimento vocale -->
+        <!-- Required on Android 11+ to use the speech recognition service -->
         <intent>
             <action android:name="android.speech.RecognitionService"/>
         </intent>

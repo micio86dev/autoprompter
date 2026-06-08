@@ -1,68 +1,72 @@
 # Autoprompter
 
-App mobile (Android + iOS) che funziona da **teleprompter intelligente**: crei
-i tuoi testi (prompt) in un editor WYSIWYG, li salvi in locale e in fase di
-lettura l'app **segue la tua voce** dal microfono, evidenziando le parole e
-facendo scorrere automaticamente il testo.
+Mobile app (Android + iOS) that works as a **smart teleprompter**: you create
+your scripts (prompts) in a WYSIWYG editor, save them locally, and while reading
+the app **follows your voice** from the microphone, highlighting the words and
+automatically scrolling the text.
 
-## Funzionalità
+## Features
 
-- **Lista prompt**: crea, apri, elimina (swipe), **duplica**, **cerca**,
-  **ordina** (data/titolo) e **filtra per tag** i tuoi testi, salvati in locale.
-- **Editor WYSIWYG** (Markdown): grassetto, corsivo, titoli (H1–H3),
-  elenchi puntati/numerati, citazioni, **link** e **codice** (inline e a
-  blocco). Include **tag**, **conteggio parole / tempo di lettura stimato** e
-  **anteprima del sorgente Markdown** (affiancata su schermi larghi). Il
-  contenuto è salvato in **Markdown**.
-- **Teleprompter con autoscroll vocale**: riconoscimento vocale **on-device**
-  (gratuito, in tempo reale, offline), evidenziazione parola-per-parola e
-  scorrimento automatico. Lingua del riconoscimento selezionabile per ogni
-  prompt (default Italiano).
-  - **Modalità specchio** (flip orizzontale/verticale) per il vetro da
-    teleprompter.
-  - **Autoscroll a velocità costante** regolabile, alternativo alla voce.
-  - **Posizione della riga di lettura** regolabile con guida a schermo.
-  - **Tap su una parola** per riposizionare il punto di lettura.
-  - Controlli: dimensione testo, "ricomincia", pannello impostazioni.
-- **Condivisione/Importazione**: esporta o condividi un prompt come file `.md`,
-  importa file Markdown esistenti.
-- **Backup/Ripristino**: esporta tutti i dati locali in un file JSON e
-  ripristinali.
-- **Tema chiaro/scuro/di sistema** per l'intera app, con valori predefiniti del
-  teleprompter (font, velocità, riga di lettura) configurabili e persistiti.
+- **Prompt list**: create, open, delete (swipe), **duplicate**, **search**,
+  **sort** (date/title) and **filter by tag** your scripts, saved locally.
+- **WYSIWYG editor** (Markdown): bold, italic, headings (H1–H3), bulleted/
+  numbered lists, quotes, **links** and **code** (inline and block). Includes
+  **tags**, **word count / estimated reading time** and a **Markdown source
+  preview** (side-by-side on wide screens). Content is saved as **Markdown**.
+- **Teleprompter with voice autoscroll**: **on-device** speech recognition
+  (free, real-time, offline), word-by-word highlighting and automatic
+  scrolling. The recognition language is selectable per prompt.
+  - **Mirror mode** (horizontal/vertical flip) for the teleprompter glass.
+  - **Constant-speed autoscroll**, adjustable, as an alternative to the voice.
+  - **Adjustable reading-line position** with an on-screen guide.
+  - **Tap a word** to reposition the reading point.
+  - Controls: text size, "restart", settings panel.
+- **Sharing/Importing**: export or share a prompt as a `.md` file, import
+  existing Markdown files.
+- **Backup/Restore**: export all local data to a JSON file and restore it.
+- **Light/dark/system theme** for the whole app, with configurable, persisted
+  teleprompter defaults (font, speed, reading line).
+- **Multilingual UI** (English and Italian) via Flutter's standard `gen_l10n`
+  internationalization. The interface follows the device language; add a locale
+  by dropping a new `lib/l10n/app_<code>.arb` file.
 
-## Architettura
+## Architecture
 
 ```
 lib/
-  main.dart                       # MaterialApp (locale it, tema chiaro/scuro) + provider
-  models/prompt.dart              # modello dati Prompt (con tag)
-  data/prompt_repository.dart     # PromptRepository (interfaccia) + impl. sqflite
+  l10n/                           # i18n: app_en.arb (template) + app_it.arb + generated AppLocalizations
+  main.dart                       # MaterialApp (system locale, light/dark theme) + providers
+  models/prompt.dart              # Prompt data model (with tags)
+  data/prompt_repository.dart     # PromptRepository (interface) + sqflite impl.
   state/
-    prompt_store.dart             # stato lista: CRUD, ricerca, filtro, ordinamento
-    settings_store.dart           # impostazioni persistite (shared_preferences)
+    prompt_store.dart             # list state: CRUD, search, filter, sorting
+    settings_store.dart           # persisted settings (shared_preferences)
   services/
-    markdown_service.dart         # Markdown <-> Delta (Quill) <-> testo
-    reading_stats.dart            # conteggio parole + tempo di lettura stimato
-    speech_service.dart           # SpeechService (interfaccia) + impl. speech_to_text
-    word_matcher.dart             # allineamento parole dette <-> testo
-    data_service.dart             # condivisione/import .md, backup/ripristino JSON
+    markdown_service.dart         # Markdown <-> Delta (Quill) <-> text
+    reading_stats.dart            # word count + estimated reading time
+    speech_service.dart           # SpeechService (interface) + speech_to_text impl.
+    word_matcher.dart             # alignment of spoken words <-> text
+    data_service.dart             # share/import .md, JSON backup/restore
   screens/
     prompt_list_screen.dart
     prompt_editor_screen.dart
     teleprompter_screen.dart
     settings_screen.dart
-  widgets/teleprompter_text.dart  # rendering "karaoke" con evidenziazione + tap
-test/                             # test unitari (logica pura) + widget test con mock
+  widgets/teleprompter_text.dart  # "karaoke" rendering with highlighting + tap
+test/                             # unit tests (pure logic) + widget tests with mocks
 ```
 
-## Prerequisiti
+User-facing strings live in `lib/l10n/*.arb`; the `AppLocalizations` class is
+generated by `flutter gen-l10n` (also run automatically by `flutter pub get`,
+since `generate: true` is set in `pubspec.yaml`).
 
-- Flutter SDK (testato con 3.44). Verifica con `flutter --version`.
-- Per **Android**: Android Studio / Android SDK.
-- Per **iOS**: Xcode completo + CocoaPods (solo su macOS).
+## Prerequisites
 
-In qualsiasi momento puoi controllare lo stato dell'ambiente con:
+- Flutter SDK (tested with 3.44). Check with `flutter --version`.
+- For **Android**: Android Studio / Android SDK.
+- For **iOS**: full Xcode + CocoaPods (macOS only).
+
+At any time you can check the state of your environment with:
 
 ```bash
 flutter doctor
@@ -70,106 +74,109 @@ flutter doctor
 
 ---
 
-## 1. Configura il toolchain mobile
+## 1. Set up the mobile toolchain
 
-Ti basta **uno** dei due (Android o iOS), in base al telefono che hai.
+You only need **one** of the two (Android or iOS), depending on the phone you
+have.
 
-### Opzione A — Android
+### Option A — Android
 
-1. **Installa Android Studio** da <https://developer.android.com/studio>.
-2. Al primo avvio segui il wizard "SDK Components Setup": installa
-   **Android SDK**, **SDK Platform-Tools** e **SDK Build-Tools**.
-   (Di default l'SDK finisce in `~/Library/Android/sdk` su macOS.)
-3. Se Flutter non trova l'SDK, indicagli il percorso:
+1. **Install Android Studio** from <https://developer.android.com/studio>.
+2. On first launch follow the "SDK Components Setup" wizard: install the
+   **Android SDK**, **SDK Platform-Tools** and **SDK Build-Tools**.
+   (By default the SDK ends up in `~/Library/Android/sdk` on macOS.)
+3. If Flutter cannot find the SDK, point it to the path:
    ```bash
    flutter config --android-sdk ~/Library/Android/sdk
    ```
-4. Accetta le licenze Android:
+4. Accept the Android licenses:
    ```bash
    flutter doctor --android-licenses
    ```
-5. Verifica che sia tutto a posto:
+5. Verify that everything is in place:
    ```bash
    flutter doctor
    ```
-   La voce **[✓] Android toolchain** deve essere verde.
+   The **[✓] Android toolchain** entry must be green.
 
-### Opzione B — iOS (solo macOS)
+### Option B — iOS (macOS only)
 
-1. **Installa Xcode** completo dall'App Store (non bastano i Command Line Tools).
-2. Punta gli strumenti da riga di comando a Xcode e completa il primo avvio:
+1. **Install the full Xcode** from the App Store (the Command Line Tools alone
+   are not enough).
+2. Point the command-line tools to Xcode and complete the first launch:
    ```bash
    sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
    sudo xcodebuild -runFirstLaunch
    ```
-3. **Installa CocoaPods**:
+3. **Install CocoaPods**:
    ```bash
    sudo gem install cocoapods
-   # in alternativa: brew install cocoapods
+   # or: brew install cocoapods
    ```
-4. Apri il progetto iOS in Xcode per impostare la firma:
+4. Open the iOS project in Xcode to set up signing:
    ```bash
    open ios/Runner.xcworkspace
    ```
-   In **Runner ▸ Signing & Capabilities** seleziona un **Team** (va bene anche
-   un Apple ID gratuito). Serve per installare l'app su un iPhone reale.
-5. Verifica con `flutter doctor` (la voce **[✓] Xcode** deve essere verde).
-   `flutter run` esegue `pod install` automaticamente; se serve, puoi farlo a
-   mano con `cd ios && pod install`.
+   In **Runner ▸ Signing & Capabilities** select a **Team** (a free Apple ID
+   works too). It is needed to install the app on a real iPhone.
+5. Verify with `flutter doctor` (the **[✓] Xcode** entry must be green).
+   `flutter run` runs `pod install` automatically; if needed, you can do it
+   manually with `cd ios && pod install`.
 
 ---
 
-## 2. Collega un telefono fisico
+## 2. Connect a physical phone
 
-> ⚠️ **Il riconoscimento vocale richiede un dispositivo reale.** Su simulatore
-> iOS / emulatore Android (e su desktop/web) il microfono non è affidabile.
+> ⚠️ **Speech recognition requires a real device.** On the iOS simulator /
+> Android emulator (and on desktop/web) the microphone is not reliable.
 
 **Android**
-1. Sul telefono: **Impostazioni ▸ Info sul telefono** e tocca 7 volte "Numero
-   build" per abilitare le **Opzioni sviluppatore**.
-2. In **Opzioni sviluppatore** attiva il **Debug USB**.
-3. Collega il telefono via USB e, sul telefono, **autorizza** il computer.
-4. Assicurati che la **Google app** sia installata (fornisce il motore vocale).
+1. On the phone: **Settings ▸ About phone** and tap "Build number" 7 times to
+   enable **Developer options**.
+2. In **Developer options** enable **USB debugging**.
+3. Connect the phone via USB and, on the phone, **authorize** the computer.
+4. Make sure the **Google app** is installed (it provides the speech engine).
 
 **iOS**
-1. Collega l'iPhone via USB e tocca **"Autorizza"** ("Trust") sul telefono.
-2. Verifica che la dettatura sia attiva: **Impostazioni ▸ Generali ▸ Tastiera ▸
-   Abilita Dettatura**.
+1. Connect the iPhone via USB and tap **"Trust"** on the phone.
+2. Check that dictation is enabled: **Settings ▸ General ▸ Keyboard ▸ Enable
+   Dictation**.
 
-Controlla che il dispositivo sia visto da Flutter:
+Check that the device is seen by Flutter:
 
 ```bash
 flutter devices
 ```
 
-Dovresti vedere il tuo telefono nell'elenco.
+You should see your phone in the list.
 
 ---
 
-## 3. Esegui l'app
+## 3. Run the app
 
-Dalla cartella del progetto:
+From the project folder:
 
 ```bash
 flutter pub get
-flutter run                 # usa il dispositivo collegato
-# se ne hai più di uno:
-flutter run -d <device-id>  # l'id lo trovi con `flutter devices`
+flutter run                 # uses the connected device
+# if you have more than one:
+flutter run -d <device-id>  # find the id with `flutter devices`
 ```
 
-Al primo avvio della lettura l'app chiederà il **permesso microfono** (su iOS
-anche quello di riconoscimento vocale): concedilo per far funzionare l'autoscroll.
+The first time you start reading, the app will request the **microphone
+permission** (on iOS, the speech recognition permission too): grant it to make
+autoscroll work.
 
-## Test
+## Tests
 
 ```bash
-flutter analyze    # nessun problema
-flutter test       # test della logica di matching e della conversione Markdown
+flutter analyze    # no issues
+flutter test       # matching logic and Markdown conversion tests
 ```
 
-## Permessi configurati
+## Configured permissions
 
 - **Android** (`android/app/src/main/AndroidManifest.xml`): `RECORD_AUDIO`,
-  `INTERNET` e query per `android.speech.RecognitionService`.
+  `INTERNET` and a query for `android.speech.RecognitionService`.
 - **iOS** (`ios/Runner/Info.plist`): `NSMicrophoneUsageDescription`,
   `NSSpeechRecognitionUsageDescription`.

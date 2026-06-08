@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Il microfono serve per seguire la tua voce e far scorrere automaticamente il testo del teleprompter.</string>
+	<string>The microphone is used to follow your voice and automatically scroll the teleprompter text.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Il riconoscimento vocale serve per evidenziare le parole che leggi e far scorrere il testo.</string>
+	<string>Speech recognition is used to highlight the words you read and scroll the text.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

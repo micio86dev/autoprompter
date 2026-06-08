@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/prompt.dart';
 import '../services/markdown_service.dart';
 import '../services/reading_stats.dart';
@@ -9,27 +10,27 @@ import '../services/speech_service.dart';
 import '../state/prompt_store.dart';
 import 'teleprompter_screen.dart';
 
-/// Lingue offerte di default quando il dispositivo non ne espone (es. desktop).
+/// Languages offered by default when the device exposes none (e.g. desktop).
 const List<SpeechLocale> _fallbackLocales = [
-  SpeechLocale('it_IT', 'Italiano (Italia)'),
-  SpeechLocale('en_US', 'Inglese (USA)'),
-  SpeechLocale('en_GB', 'Inglese (Regno Unito)'),
-  SpeechLocale('es_ES', 'Spagnolo (Spagna)'),
-  SpeechLocale('fr_FR', 'Francese (Francia)'),
-  SpeechLocale('de_DE', 'Tedesco (Germania)'),
-  SpeechLocale('pt_PT', 'Portoghese (Portogallo)'),
+  SpeechLocale('it_IT', 'Italian (Italy)'),
+  SpeechLocale('en_US', 'English (US)'),
+  SpeechLocale('en_GB', 'English (UK)'),
+  SpeechLocale('es_ES', 'Spanish (Spain)'),
+  SpeechLocale('fr_FR', 'French (France)'),
+  SpeechLocale('de_DE', 'German (Germany)'),
+  SpeechLocale('pt_PT', 'Portuguese (Portugal)'),
 ];
 
-/// Larghezza oltre la quale editor e anteprima Markdown stanno affiancati.
+/// Width above which the editor and Markdown preview sit side by side.
 const double _splitBreakpoint = 720;
 
 class PromptEditorScreen extends StatefulWidget {
   const PromptEditorScreen({super.key, required this.prompt, this.speech});
 
-  /// Il prompt da modificare (usa [Prompt.create] per uno nuovo).
+  /// The prompt to edit (use [Prompt.create] for a new one).
   final Prompt prompt;
 
-  /// Iniettabile nei test per elencare le lingue; default: riconoscimento reale.
+  /// Injectable in tests to list languages; defaults to the real recognizer.
   final SpeechService? speech;
 
   @override
@@ -58,7 +59,7 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
       document: doc,
       selection: const TextSelection.collapsed(offset: 0),
     );
-    // Aggiorna statistiche e anteprima mentre si scrive.
+    // Update statistics and preview while typing.
     _quillController.addListener(_onDocChanged);
     _loadLocales();
   }
@@ -74,7 +75,7 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
       for (final l in _fallbackLocales) l.id: l,
       for (final l in fetched) l.id: l,
     };
-    // Garantisce che la lingua selezionata sia presente nell'elenco.
+    // Ensure the selected language is present in the list.
     merged.putIfAbsent(_localeId, () => SpeechLocale(_localeId, _localeId));
     final list = merged.values.toList()
       ..sort((a, b) => a.name.compareTo(b.name));
@@ -111,11 +112,12 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
   }
 
   Future<void> _onSavePressed() async {
+    final l10n = AppLocalizations.of(context);
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     await _save();
     messenger.showSnackBar(
-      const SnackBar(content: Text('Prompt salvato')),
+      SnackBar(content: Text(l10n.promptSaved)),
     );
     navigator.pop();
   }
@@ -145,6 +147,7 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final stats =
         ReadingStats.fromPlainText(_quillController.document.toPlainText());
     return PopScope(
@@ -157,20 +160,20 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Modifica prompt'),
+          title: Text(l10n.editPrompt),
           actions: [
             IconButton(
-              tooltip: _showPreview ? 'Nascondi anteprima' : 'Anteprima Markdown',
+              tooltip: _showPreview ? l10n.hidePreview : l10n.markdownPreview,
               icon: Icon(_showPreview ? Icons.code_off : Icons.code),
               onPressed: () => setState(() => _showPreview = !_showPreview),
             ),
             IconButton(
-              tooltip: 'Apri teleprompter',
+              tooltip: l10n.openTeleprompter,
               icon: const Icon(Icons.play_circle_fill),
               onPressed: _saving ? null : _openTeleprompter,
             ),
             IconButton(
-              tooltip: 'Salva',
+              tooltip: l10n.save,
               icon: const Icon(Icons.check),
               onPressed: _saving ? null : _onSavePressed,
             ),
@@ -185,8 +188,8 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold),
-                decoration: const InputDecoration(
-                  hintText: 'Titolo',
+                decoration: InputDecoration(
+                  hintText: l10n.titleHint,
                   border: InputBorder.none,
                 ),
               ),
@@ -197,7 +200,7 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
                 children: [
                   const Icon(Icons.mic, size: 20),
                   const SizedBox(width: 8),
-                  const Text('Lingua voce:'),
+                  Text(l10n.voiceLanguage),
                   const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButton<String>(
@@ -272,13 +275,14 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
   }
 
   Widget _buildBody() {
+    final l10n = AppLocalizations.of(context);
     final editor = Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: QuillEditor.basic(
         controller: _quillController,
-        config: const QuillEditorConfig(
-          placeholder: 'Scrivi qui il testo del prompt…',
-          padding: EdgeInsets.symmetric(vertical: 12),
+        config: QuillEditorConfig(
+          placeholder: l10n.editorPlaceholder,
+          padding: const EdgeInsets.symmetric(vertical: 12),
         ),
       ),
     );
@@ -298,14 +302,14 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
             ],
           );
         }
-        // Su schermi stretti l'anteprima sostituisce l'editor.
+        // On narrow screens the preview replaces the editor.
         return preview;
       },
     );
   }
 }
 
-/// Editor dei tag: chip rimovibili + campo per aggiungerne (virgola o invio).
+/// Tag editor: removable chips + a field to add more (comma or enter).
 class _TagEditor extends StatelessWidget {
   const _TagEditor({
     required this.tags,
@@ -321,6 +325,7 @@ class _TagEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
       child: Row(
@@ -344,9 +349,9 @@ class _TagEditor extends StatelessWidget {
                   width: 140,
                   child: TextField(
                     controller: controller,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       isDense: true,
-                      hintText: 'Aggiungi tag…',
+                      hintText: l10n.addTagHint,
                       border: InputBorder.none,
                     ),
                     textInputAction: TextInputAction.done,
@@ -365,7 +370,7 @@ class _TagEditor extends StatelessWidget {
   }
 }
 
-/// Anteprima del sorgente Markdown generato (sola lettura, monospazio).
+/// Preview of the generated Markdown source (read-only, monospace).
 class _MarkdownPreview extends StatelessWidget {
   const _MarkdownPreview({required this.markdown});
 
@@ -373,12 +378,13 @@ class _MarkdownPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       padding: const EdgeInsets.all(16),
       child: SingleChildScrollView(
         child: SelectableText(
-          markdown.isEmpty ? '_(vuoto)_' : markdown,
+          markdown.isEmpty ? l10n.emptyMarkdownPreview : markdown,
           style: const TextStyle(fontFamily: 'monospace', height: 1.4),
         ),
       ),
@@ -386,7 +392,7 @@ class _MarkdownPreview extends StatelessWidget {
   }
 }
 
-/// Barra inferiore con conteggio parole e tempo di lettura stimato.
+/// Bottom bar with word count and estimated reading time.
 class _StatsBar extends StatelessWidget {
   const _StatsBar({required this.stats});
 
@@ -394,6 +400,7 @@ class _StatsBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Material(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Padding(
@@ -403,8 +410,10 @@ class _StatsBar extends StatelessWidget {
             Icon(Icons.timer_outlined,
                 size: 16, color: Theme.of(context).hintColor),
             const SizedBox(width: 6),
-            Text(stats.label,
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            Text(
+              l10n.readingStatsLabel(stats.wordCount, stats.durationLabel),
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
           ],
         ),
       ),

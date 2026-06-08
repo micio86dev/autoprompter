@@ -1,3 +1,4 @@
+import 'package:autoprompter/l10n/app_localizations.dart';
 import 'package:autoprompter/models/prompt.dart';
 import 'package:autoprompter/screens/prompt_list_screen.dart';
 import 'package:autoprompter/state/prompt_store.dart';
@@ -19,7 +20,12 @@ Widget _app(PromptStore store) {
       ChangeNotifierProvider<PromptStore>.value(value: store),
       ChangeNotifierProvider(create: (_) => SettingsStore()),
     ],
-    child: const MaterialApp(home: PromptListScreen()),
+    child: const MaterialApp(
+      locale: Locale('en'),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: PromptListScreen(),
+    ),
   );
 }
 
@@ -28,23 +34,23 @@ void main() {
 
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  testWidgets('mostra i prompt salvati dallo storage', (tester) async {
+  testWidgets('shows the prompts saved in storage', (tester) async {
     final repo = FakePromptRepository([
-      _p('Intro al prodotto', content: 'benvenuti'),
-      _p('Ringraziamenti', content: 'grazie'),
+      _p('Product intro', content: 'welcome'),
+      _p('Thanks', content: 'thanks'),
     ]);
     final store = PromptStore(repo);
     await tester.pumpWidget(_app(store));
     await tester.pumpAndSettle();
 
-    expect(find.text('Intro al prodotto'), findsOneWidget);
-    expect(find.text('Ringraziamenti'), findsOneWidget);
+    expect(find.text('Product intro'), findsOneWidget);
+    expect(find.text('Thanks'), findsOneWidget);
   });
 
-  testWidgets('la ricerca filtra la lista', (tester) async {
+  testWidgets('search filters the list', (tester) async {
     final repo = FakePromptRepository([
-      _p('Intro al prodotto', content: 'benvenuti'),
-      _p('Ringraziamenti', content: 'grazie'),
+      _p('Product intro', content: 'welcome'),
+      _p('Thanks', content: 'thanks'),
     ]);
     final store = PromptStore(repo);
     await tester.pumpWidget(_app(store));
@@ -52,50 +58,50 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.search));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), 'ringrazia');
+    await tester.enterText(find.byType(TextField), 'thank');
     await tester.pumpAndSettle();
 
-    expect(find.text('Ringraziamenti'), findsOneWidget);
-    expect(find.text('Intro al prodotto'), findsNothing);
+    expect(find.text('Thanks'), findsOneWidget);
+    expect(find.text('Product intro'), findsNothing);
   });
 
-  testWidgets('il filtro per tag mostra solo i prompt con quel tag',
+  testWidgets('the tag filter shows only the prompts with that tag',
       (tester) async {
     final repo = FakePromptRepository([
-      _p('Con tag', content: 'x', tags: ['lavoro']),
-      _p('Senza tag', content: 'y'),
+      _p('With tag', content: 'x', tags: ['work']),
+      _p('Without tag', content: 'y'),
     ]);
     final store = PromptStore(repo);
     await tester.pumpWidget(_app(store));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(FilterChip, 'lavoro'));
+    await tester.tap(find.widgetWithText(FilterChip, 'work'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Con tag'), findsOneWidget);
-    expect(find.text('Senza tag'), findsNothing);
+    expect(find.text('With tag'), findsOneWidget);
+    expect(find.text('Without tag'), findsNothing);
   });
 
-  testWidgets('duplica un prompt dal menu azioni', (tester) async {
-    final repo = FakePromptRepository([_p('Originale', content: 'testo')]);
+  testWidgets('duplicates a prompt from the actions menu', (tester) async {
+    final repo = FakePromptRepository([_p('Original', content: 'text')]);
     final store = PromptStore(repo);
     await tester.pumpWidget(_app(store));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.more_vert).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Duplica'));
+    await tester.tap(find.text('Duplicate'));
     await tester.pumpAndSettle();
 
     expect(store.prompts.length, 2);
-    expect(find.text('Originale (copia)'), findsOneWidget);
+    expect(find.text('Original (copy)'), findsOneWidget);
   });
 
-  testWidgets('stato vuoto quando non ci sono prompt', (tester) async {
+  testWidgets('empty state when there are no prompts', (tester) async {
     final store = PromptStore(FakePromptRepository());
     await tester.pumpWidget(_app(store));
     await tester.pumpAndSettle();
 
-    expect(find.text('Nessun prompt'), findsOneWidget);
+    expect(find.text('No prompts'), findsOneWidget);
   });
 }

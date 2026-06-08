@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Impostazioni dell'app persistite localmente (tema e default di lettura).
+/// App settings persisted locally (theme and reading defaults).
 class SettingsStore extends ChangeNotifier {
   static const _kThemeMode = 'theme_mode';
   static const _kFontSize = 'default_font_size';

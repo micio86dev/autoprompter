@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/prompt.dart';
 import '../services/data_service.dart';
 import '../services/markdown_service.dart';
@@ -10,8 +11,16 @@ import 'prompt_editor_screen.dart';
 import 'settings_screen.dart';
 import 'teleprompter_screen.dart';
 
-/// Schermata principale: elenco dei prompt salvati, con ricerca, ordinamento e
-/// filtro per tag.
+/// The localized label for a [PromptSort] value.
+String sortLabel(AppLocalizations l10n, PromptSort sort) => switch (sort) {
+      PromptSort.updatedDesc => l10n.sortUpdatedDesc,
+      PromptSort.updatedAsc => l10n.sortUpdatedAsc,
+      PromptSort.titleAsc => l10n.sortTitleAsc,
+      PromptSort.titleDesc => l10n.sortTitleDesc,
+      PromptSort.createdDesc => l10n.sortCreatedDesc,
+    };
+
+/// Main screen: list of saved prompts, with search, sorting and tag filtering.
 class PromptListScreen extends StatefulWidget {
   const PromptListScreen({super.key});
 
@@ -77,23 +86,25 @@ class _PromptListScreenState extends State<PromptListScreen> {
   }
 
   Future<void> _confirmDelete(Prompt prompt) async {
+    final l10n = AppLocalizations.of(context);
     final store = context.read<PromptStore>();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminare il prompt?'),
+        title: Text(l10n.deletePromptTitle),
         content: Text(
-          'Vuoi eliminare "${prompt.title.isEmpty ? 'Senza titolo' : prompt.title}"? '
-          'L\'operazione non può essere annullata.',
+          l10n.deletePromptMessage(
+            prompt.title.isEmpty ? l10n.untitled : prompt.title,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Annulla'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Elimina'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -104,24 +115,31 @@ class _PromptListScreenState extends State<PromptListScreen> {
   }
 
   Future<void> _duplicate(Prompt prompt) async {
+    final l10n = AppLocalizations.of(context);
     final store = context.read<PromptStore>();
     final messenger = ScaffoldMessenger.of(context);
-    await store.duplicate(prompt);
-    messenger.showSnackBar(const SnackBar(content: Text('Prompt duplicato')));
+    await store.duplicate(
+      prompt,
+      copySuffix: l10n.copySuffix,
+      untitledLabel: l10n.untitled,
+    );
+    messenger.showSnackBar(SnackBar(content: Text(l10n.promptDuplicated)));
   }
 
   Future<void> _share(Prompt prompt) async {
+    final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
       await DataService.instance.sharePrompt(prompt);
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text('Condivisione non riuscita: $e')),
+        SnackBar(content: Text(l10n.shareFailed('$e'))),
       );
     }
   }
 
   Future<void> _importMarkdown(PromptStore store) async {
+    final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
       final prompt = await DataService.instance.importMarkdown();
@@ -131,16 +149,17 @@ class _PromptListScreenState extends State<PromptListScreen> {
       _openEditor(saved);
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text('Importazione non riuscita: $e')),
+        SnackBar(content: Text(l10n.importFailed('$e'))),
       );
     }
   }
 
   Future<void> _backup(PromptStore store) async {
+    final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     if (store.prompts.isEmpty) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Nessun prompt da salvare')),
+        SnackBar(content: Text(l10n.noPromptsToBackup)),
       );
       return;
     }
@@ -148,28 +167,30 @@ class _PromptListScreenState extends State<PromptListScreen> {
       await DataService.instance.backup(store.prompts);
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text('Backup non riuscito: $e')),
+        SnackBar(content: Text(l10n.backupFailed('$e'))),
       );
     }
   }
 
   Future<void> _restore(PromptStore store) async {
+    final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     try {
       final result = await DataService.instance.restore();
       if (result == null) return;
       final n = await store.restore(result.prompts);
       messenger.showSnackBar(
-        SnackBar(content: Text('Ripristinati $n prompt')),
+        SnackBar(content: Text(l10n.promptsRestored(n))),
       );
     } catch (e) {
       messenger.showSnackBar(
-        SnackBar(content: Text('Ripristino non riuscito: $e')),
+        SnackBar(content: Text(l10n.restoreFailed('$e'))),
       );
     }
   }
 
   void _showActions(Prompt prompt) {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
@@ -178,7 +199,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
           children: [
             ListTile(
               title: Text(
-                prompt.title.isEmpty ? 'Senza titolo' : prompt.title,
+                prompt.title.isEmpty ? l10n.untitled : prompt.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontWeight: FontWeight.bold),
@@ -187,7 +208,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
             const Divider(height: 1),
             ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('Modifica'),
+              title: Text(l10n.edit),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _openEditor(prompt);
@@ -195,7 +216,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.play_circle_outline),
-              title: const Text('Apri teleprompter'),
+              title: Text(l10n.openTeleprompter),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _openTeleprompter(prompt);
@@ -203,7 +224,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.copy_outlined),
-              title: const Text('Duplica'),
+              title: Text(l10n.duplicate),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _duplicate(prompt);
@@ -211,7 +232,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.ios_share),
-              title: const Text('Condividi (.md)'),
+              title: Text(l10n.shareMd),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _share(prompt);
@@ -219,7 +240,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Elimina', style: TextStyle(color: Colors.red)),
+              title: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.of(ctx).pop();
                 _confirmDelete(prompt);
@@ -235,12 +256,13 @@ class _PromptListScreenState extends State<PromptListScreen> {
     final plain = MarkdownService.markdownToPlainText(prompt.contentMarkdown)
         .replaceAll('\n', ' ')
         .trim();
-    if (plain.isEmpty) return 'Nessun contenuto';
+    if (plain.isEmpty) return AppLocalizations.of(context).noContent;
     return plain.length > 100 ? '${plain.substring(0, 100)}…' : plain;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final store = context.watch<PromptStore>();
     return Scaffold(
       appBar: AppBar(
@@ -248,17 +270,17 @@ class _PromptListScreenState extends State<PromptListScreen> {
             ? TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Cerca nei prompt…',
+                decoration: InputDecoration(
+                  hintText: l10n.searchPromptsHint,
                   border: InputBorder.none,
                 ),
                 onChanged: store.setQuery,
               )
-            : const Text('Autoprompter'),
+            : Text(l10n.appTitle),
         actions: [
           if (_searching)
             IconButton(
-              tooltip: 'Chiudi ricerca',
+              tooltip: l10n.closeSearch,
               icon: const Icon(Icons.close),
               onPressed: () {
                 _searchController.clear();
@@ -268,29 +290,29 @@ class _PromptListScreenState extends State<PromptListScreen> {
             )
           else
             IconButton(
-              tooltip: 'Cerca',
+              tooltip: l10n.search,
               icon: const Icon(Icons.search),
               onPressed: () => setState(() => _searching = true),
             ),
           PopupMenuButton<PromptSort>(
-            tooltip: 'Ordina',
+            tooltip: l10n.sortTooltip,
             icon: const Icon(Icons.sort),
             initialValue: store.sort,
             onSelected: store.setSort,
             itemBuilder: (_) => [
               for (final s in PromptSort.values)
-                PopupMenuItem(value: s, child: Text(s.label)),
+                PopupMenuItem(value: s, child: Text(sortLabel(l10n, s))),
             ],
           ),
           PopupMenuButton<String>(
-            tooltip: 'Menu',
+            tooltip: l10n.menuTooltip,
             onSelected: (value) => _onMenuSelected(value, store),
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'import', child: Text('Importa Markdown…')),
-              PopupMenuItem(value: 'backup', child: Text('Backup dati…')),
-              PopupMenuItem(value: 'restore', child: Text('Ripristina backup…')),
-              PopupMenuDivider(),
-              PopupMenuItem(value: 'settings', child: Text('Impostazioni')),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: 'import', child: Text(l10n.importMarkdown)),
+              PopupMenuItem(value: 'backup', child: Text(l10n.backupData)),
+              PopupMenuItem(value: 'restore', child: Text(l10n.restoreBackup)),
+              const PopupMenuDivider(),
+              PopupMenuItem(value: 'settings', child: Text(l10n.settings)),
             ],
           ),
         ],
@@ -304,12 +326,13 @@ class _PromptListScreenState extends State<PromptListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openEditor(Prompt.create()),
         icon: const Icon(Icons.add),
-        label: const Text('Nuovo prompt'),
+        label: Text(l10n.newPrompt),
       ),
     );
   }
 
   Widget _buildList(PromptStore store) {
+    final l10n = AppLocalizations.of(context);
     if (store.loading && store.prompts.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -335,7 +358,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
           direction: DismissDirection.endToStart,
           confirmDismiss: (_) async {
             await _confirmDelete(prompt);
-            return false; // la cancellazione la gestisce lo store
+            return false; // deletion is handled by the store
           },
           background: Container(
             color: Colors.red,
@@ -345,7 +368,7 @@ class _PromptListScreenState extends State<PromptListScreen> {
           ),
           child: ListTile(
             title: Text(
-              prompt.title.isEmpty ? 'Senza titolo' : prompt.title,
+              prompt.title.isEmpty ? l10n.untitled : prompt.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(fontWeight: FontWeight.w600),
@@ -385,14 +408,14 @@ class _PromptListScreenState extends State<PromptListScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  tooltip: 'Apri teleprompter',
+                  tooltip: l10n.openTeleprompter,
                   icon: const Icon(Icons.play_circle_fill),
                   color: Theme.of(context).colorScheme.primary,
                   iconSize: 34,
                   onPressed: () => _openTeleprompter(prompt),
                 ),
                 IconButton(
-                  tooltip: 'Altre azioni',
+                  tooltip: l10n.moreActions,
                   icon: const Icon(Icons.more_vert),
                   onPressed: () => _showActions(prompt),
                 ),
@@ -405,8 +428,8 @@ class _PromptListScreenState extends State<PromptListScreen> {
   }
 }
 
-/// Barra orizzontale di chip per filtrare per tag. Si nasconde se non ci sono
-/// tag tra i prompt.
+/// Horizontal bar of chips to filter by tag. Hidden when there are no tags
+/// across the prompts.
 class _TagFilterBar extends StatelessWidget {
   const _TagFilterBar({required this.store});
 
@@ -444,6 +467,7 @@ class _NoResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -451,9 +475,9 @@ class _NoResults extends StatelessWidget {
           Icon(Icons.search_off,
               size: 64, color: Theme.of(context).disabledColor),
           const SizedBox(height: 12),
-          const Text('Nessun prompt corrisponde ai filtri'),
+          Text(l10n.noPromptsMatchFilters),
           const SizedBox(height: 8),
-          TextButton(onPressed: onClear, child: const Text('Azzera i filtri')),
+          TextButton(onPressed: onClear, child: Text(l10n.clearFilters)),
         ],
       ),
     );
@@ -465,6 +489,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -474,14 +499,13 @@ class _EmptyState extends StatelessWidget {
             Icon(Icons.article_outlined,
                 size: 72, color: Theme.of(context).disabledColor),
             const SizedBox(height: 16),
-            const Text(
-              'Nessun prompt',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              l10n.noPrompts,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tocca "Nuovo prompt" per creare il tuo primo testo da leggere '
-              'al teleprompter.',
+            Text(
+              l10n.emptyStateMessage,
               textAlign: TextAlign.center,
             ),
           ],

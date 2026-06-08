@@ -26,9 +26,11 @@ automatically scrolling the text.
 - **Backup/Restore**: export all local data to a JSON file and restore it.
 - **Light/dark/system theme** for the whole app, with configurable, persisted
   teleprompter defaults (font, speed, reading line).
-- **Multilingual UI** (English and Italian) via Flutter's standard `gen_l10n`
-  internationalization. The interface follows the device language; add a locale
-  by dropping a new `lib/l10n/app_<code>.arb` file.
+- **Multilingual UI** via Flutter's standard `gen_l10n` internationalization,
+  covering the world's most widely spoken languages: English, Spanish, Mandarin
+  Chinese, Hindi, Arabic, Portuguese, French, Bengali, Russian, Indonesian,
+  German, Japanese and Italian. The interface follows the device language; add
+  a locale by dropping a new `lib/l10n/app_<code>.arb` file.
 
 ## Architecture
 

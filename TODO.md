@@ -25,7 +25,8 @@
 - [x] End-to-end widget tests (with storage and voice mocks).
 - [x] Dark theme for the whole app (beyond the teleprompter view).
 - [x] Backup/restore of local data.
-- [x] Multilingual UI (English/Italian) via `gen_l10n` internationalization.
+- [x] Multilingual UI via `gen_l10n` internationalization (13 languages: en, es,
+  zh, hi, ar, pt, fr, bn, ru, id, de, ja, it).
 
 ## Future ideas
 - [ ] Hierarchical folders (beyond flat tags).

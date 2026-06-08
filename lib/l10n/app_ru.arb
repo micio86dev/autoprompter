@@ -81,5 +81,11 @@
   "startReading": "Начать чтение",
   "speechUnavailable": "Распознавание речи недоступно на этом устройстве или нет доступа к микрофону.",
 
-  "readingStatsLabel": "{count, plural, one{{count} слово} few{{count} слова} many{{count} слов} other{{count} слов}} · ~{time}"
+  "readingStatsLabel": "{count, plural, one{{count} слово} few{{count} слова} many{{count} слов} other{{count} слов}} · ~{time}",
+
+  "micPermissionTitle": "Доступ к микрофону",
+  "micPermissionRationale": "Autoprompter использует микрофон, чтобы следовать за вашим голосом и автоматически прокручивать текст. Звук обрабатывается на вашем устройстве для распознавания речи — он не записывается и не передаётся.",
+  "continueLabel": "Продолжить",
+  "micPermissionDenied": "Доступ к микрофону запрещён. Включите его в настройках, чтобы использовать прокрутку голосом.",
+  "openSettings": "Открыть настройки"
 }

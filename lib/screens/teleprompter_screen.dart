@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import '../l10n/app_localizations.dart';
 import '../models/prompt.dart';
 import '../services/markdown_service.dart';
+import '../services/permission_service.dart';
 import '../services/speech_service.dart';
 import '../services/word_matcher.dart';
 import '../widgets/teleprompter_text.dart';
@@ -16,6 +17,7 @@ class TeleprompterScreen extends StatefulWidget {
     super.key,
     required this.prompt,
     this.speech,
+    this.permissions,
     this.initialFontSize = 32,
     this.initialScrollSpeed = 40,
     this.initialReadingLine = 0.35,
@@ -25,6 +27,9 @@ class TeleprompterScreen extends StatefulWidget {
 
   /// Injectable in tests; defaults to the real speech recognizer.
   final SpeechService? speech;
+
+  /// Injectable in tests; defaults to the real microphone permission handler.
+  final MicPermissionService? permissions;
 
   final double initialFontSize;
   final double initialScrollSpeed;
@@ -37,6 +42,7 @@ class TeleprompterScreen extends StatefulWidget {
 class _TeleprompterScreenState extends State<TeleprompterScreen>
     with SingleTickerProviderStateMixin {
   late final SpeechService _speech;
+  late final MicPermissionService _permissions;
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _currentWordKey = GlobalKey();
 
@@ -59,6 +65,7 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
   void initState() {
     super.initState();
     _speech = widget.speech ?? SttSpeechService();
+    _permissions = widget.permissions ?? const PermissionHandlerMicService();
     _fontSize = widget.initialFontSize;
     _scrollSpeed = widget.initialScrollSpeed;
     _readingLine = widget.initialReadingLine;
@@ -83,6 +90,10 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
       return;
     }
     final l10n = AppLocalizations.of(context);
+    // Explain why we need the microphone (in the app's language) before the OS
+    // permission prompt, and don't start listening unless it's granted.
+    if (!await _ensureMicPermission(l10n)) return;
+    if (!mounted) return;
     setState(() => _message = null);
     final ok = await _speech.start(
       localeId: widget.prompt.localeId,
@@ -106,6 +117,53 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
         _message = l10n.speechUnavailable;
       });
     }
+  }
+
+  /// Ensures the microphone permission is granted, showing a localized rationale
+  /// before the OS prompt. Returns true only if listening may proceed.
+  Future<bool> _ensureMicPermission(AppLocalizations l10n) async {
+    if (await _permissions.status() == MicPermissionStatus.granted) return true;
+    if (!mounted) return false;
+
+    final proceed = await _showMicRationale(l10n);
+    if (proceed != true) return false;
+
+    final result = await _permissions.request();
+    if (result == MicPermissionStatus.granted) return true;
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.micPermissionDenied),
+          action: SnackBarAction(
+            label: l10n.openSettings,
+            onPressed: _permissions.openSettings,
+          ),
+        ),
+      );
+    }
+    return false;
+  }
+
+  Future<bool?> _showMicRationale(AppLocalizations l10n) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.mic),
+        title: Text(l10n.micPermissionTitle),
+        content: Text(l10n.micPermissionRationale),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.continueLabel),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onWords(List<String> words) {

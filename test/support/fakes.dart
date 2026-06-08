@@ -1,5 +1,6 @@
 import 'package:autoprompter/data/prompt_repository.dart';
 import 'package:autoprompter/models/prompt.dart';
+import 'package:autoprompter/services/permission_service.dart';
 import 'package:autoprompter/services/speech_service.dart';
 
 /// In-memory repository for tests (replaces sqflite).
@@ -79,4 +80,34 @@ class FakeSpeechService implements SpeechService {
 
   /// Simulates the recognition of new words.
   void emit(List<String> words) => _onWords?.call(words);
+}
+
+/// Fake microphone permission service: returns scripted statuses without
+/// touching the platform.
+class FakeMicPermissionService implements MicPermissionService {
+  FakeMicPermissionService({
+    this.initial = MicPermissionStatus.granted,
+    MicPermissionStatus? afterRequest,
+  }) : afterRequest = afterRequest ?? MicPermissionStatus.granted;
+
+  /// Status returned by [status] (before any request).
+  MicPermissionStatus initial;
+
+  /// Status returned by [request].
+  MicPermissionStatus afterRequest;
+
+  int requestCount = 0;
+  bool settingsOpened = false;
+
+  @override
+  Future<MicPermissionStatus> status() async => initial;
+
+  @override
+  Future<MicPermissionStatus> request() async {
+    requestCount++;
+    return afterRequest;
+  }
+
+  @override
+  Future<void> openSettings() async => settingsOpened = true;
 }

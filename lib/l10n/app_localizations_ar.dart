@@ -239,6 +239,23 @@ class AppLocalizationsAr extends AppLocalizations {
       'التعرّف على الكلام غير متاح على هذا الجهاز أو تم رفض إذن الميكروفون.';
 
   @override
+  String get micPermissionTitle => 'الوصول إلى الميكروفون';
+
+  @override
+  String get micPermissionRationale =>
+      'يستخدم Autoprompter الميكروفون لمتابعة صوتك وتمرير النص تلقائيًا. تتم معالجة الصوت على جهازك للتعرّف على الكلام، ولا يتم تسجيله أو مشاركته.';
+
+  @override
+  String get continueLabel => 'متابعة';
+
+  @override
+  String get micPermissionDenied =>
+      'تم رفض إذن الميكروفون. فعّله من الإعدادات لاستخدام التمرير الصوتي.';
+
+  @override
+  String get openSettings => 'فتح الإعدادات';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

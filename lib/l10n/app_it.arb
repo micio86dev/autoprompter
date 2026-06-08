@@ -81,5 +81,11 @@
   "startReading": "Avvia lettura",
   "speechUnavailable": "Riconoscimento vocale non disponibile su questo dispositivo o permesso microfono negato.",
 
-  "readingStatsLabel": "{count, plural, =1{1 parola} other{{count} parole}} · ~{time}"
+  "readingStatsLabel": "{count, plural, =1{1 parola} other{{count} parole}} · ~{time}",
+
+  "micPermissionTitle": "Accesso al microfono",
+  "micPermissionRationale": "Autoprompter usa il microfono per seguire la tua voce e far scorrere il testo automaticamente. L'audio è elaborato sul tuo dispositivo per il riconoscimento vocale: non viene registrato né condiviso.",
+  "continueLabel": "Continua",
+  "micPermissionDenied": "Permesso microfono negato. Abilitalo nelle Impostazioni per usare lo scorrimento vocale.",
+  "openSettings": "Apri impostazioni"
 }

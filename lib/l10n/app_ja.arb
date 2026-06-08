@@ -81,5 +81,11 @@
   "startReading": "読み上げを開始",
   "speechUnavailable": "この端末では音声認識を利用できないか、マイクの権限が拒否されています。",
 
-  "readingStatsLabel": "{count, plural, other{{count} 語}} · ~{time}"
+  "readingStatsLabel": "{count, plural, other{{count} 語}} · ~{time}",
+
+  "micPermissionTitle": "マイクへのアクセス",
+  "micPermissionRationale": "Autoprompter は、あなたの声に合わせてテキストを自動でスクロールするためにマイクを使用します。音声は音声認識のために端末内で処理され、録音や共有はされません。",
+  "continueLabel": "続ける",
+  "micPermissionDenied": "マイクの権限が拒否されました。音声スクロールを使うには設定で有効にしてください。",
+  "openSettings": "設定を開く"
 }

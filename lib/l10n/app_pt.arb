@@ -81,5 +81,11 @@
   "startReading": "Iniciar leitura",
   "speechUnavailable": "O reconhecimento de voz não está disponível neste dispositivo ou a permissão do microfone foi negada.",
 
-  "readingStatsLabel": "{count, plural, =1{1 palavra} other{{count} palavras}} · ~{time}"
+  "readingStatsLabel": "{count, plural, =1{1 palavra} other{{count} palavras}} · ~{time}",
+
+  "micPermissionTitle": "Acesso ao microfone",
+  "micPermissionRationale": "O Autoprompter usa o microfone para seguir sua voz e rolar o texto automaticamente. O áudio é processado no seu dispositivo para o reconhecimento de voz: não é gravado nem compartilhado.",
+  "continueLabel": "Continuar",
+  "micPermissionDenied": "Permissão do microfone negada. Ative-a nas Configurações para usar a rolagem por voz.",
+  "openSettings": "Abrir configurações"
 }

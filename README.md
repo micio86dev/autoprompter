@@ -181,7 +181,8 @@ flutter test       # matching logic and Markdown conversion tests
 - **Android** (`android/app/src/main/AndroidManifest.xml`): `RECORD_AUDIO`,
   `INTERNET` and a query for `android.speech.RecognitionService`.
   The runtime permission dialog text is provided by the OS (not customizable
-  from the manifest).
+  from the manifest), so before requesting it the app shows its own **localized
+  rationale dialog** (the same on iOS) explaining why the microphone is needed.
 - **iOS** (`ios/Runner/Info.plist`): `NSMicrophoneUsageDescription`,
   `NSSpeechRecognitionUsageDescription`. These usage descriptions are
   **localized** in all supported languages via `ios/Runner/<lang>.lproj/

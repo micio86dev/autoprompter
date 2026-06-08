@@ -240,6 +240,23 @@ class AppLocalizationsEs extends AppLocalizations {
       'El reconocimiento de voz no está disponible en este dispositivo o se ha denegado el permiso del micrófono.';
 
   @override
+  String get micPermissionTitle => 'Acceso al micrófono';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter usa el micrófono para seguir tu voz y desplazar el texto automáticamente. El audio se procesa en tu dispositivo para el reconocimiento de voz: no se graba ni se comparte.';
+
+  @override
+  String get continueLabel => 'Continuar';
+
+  @override
+  String get micPermissionDenied =>
+      'Permiso de micrófono denegado. Actívalo en Ajustes para usar el desplazamiento por voz.';
+
+  @override
+  String get openSettings => 'Abrir ajustes';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -81,5 +81,11 @@
   "startReading": "开始朗读",
   "speechUnavailable": "此设备不支持语音识别，或麦克风权限被拒绝。",
 
-  "readingStatsLabel": "{count, plural, other{{count} 个词}} · ~{time}"
+  "readingStatsLabel": "{count, plural, other{{count} 个词}} · ~{time}",
+
+  "micPermissionTitle": "麦克风权限",
+  "micPermissionRationale": "Autoprompter 使用麦克风跟随你的声音并自动滚动文本。音频在你的设备上进行语音识别处理，不会被录制或分享。",
+  "continueLabel": "继续",
+  "micPermissionDenied": "麦克风权限被拒绝。请在“设置”中启用，以使用语音滚动。",
+  "openSettings": "打开设置"
 }

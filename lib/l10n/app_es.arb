@@ -81,5 +81,11 @@
   "startReading": "Iniciar lectura",
   "speechUnavailable": "El reconocimiento de voz no está disponible en este dispositivo o se ha denegado el permiso del micrófono.",
 
-  "readingStatsLabel": "{count, plural, =1{1 palabra} other{{count} palabras}} · ~{time}"
+  "readingStatsLabel": "{count, plural, =1{1 palabra} other{{count} palabras}} · ~{time}",
+
+  "micPermissionTitle": "Acceso al micrófono",
+  "micPermissionRationale": "Autoprompter usa el micrófono para seguir tu voz y desplazar el texto automáticamente. El audio se procesa en tu dispositivo para el reconocimiento de voz: no se graba ni se comparte.",
+  "continueLabel": "Continuar",
+  "micPermissionDenied": "Permiso de micrófono denegado. Actívalo en Ajustes para usar el desplazamiento por voz.",
+  "openSettings": "Abrir ajustes"
 }

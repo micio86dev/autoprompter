@@ -540,6 +540,36 @@ abstract class AppLocalizations {
   /// **'Speech recognition is unavailable on this device or microphone permission was denied.'**
   String get speechUnavailable;
 
+  /// No description provided for @micPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone access'**
+  String get micPermissionTitle;
+
+  /// No description provided for @micPermissionRationale.
+  ///
+  /// In en, this message translates to:
+  /// **'Autoprompter uses the microphone to follow your voice and scroll the text automatically. Audio is processed on your device for speech recognition — it is not recorded or shared.'**
+  String get micPermissionRationale;
+
+  /// No description provided for @continueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueLabel;
+
+  /// No description provided for @micPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone permission denied. Enable it in Settings to use voice scrolling.'**
+  String get micPermissionDenied;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get openSettings;
+
   /// Word count and estimated reading time shown under the editor.
   ///
   /// In en, this message translates to:

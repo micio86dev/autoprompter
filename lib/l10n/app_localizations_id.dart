@@ -240,6 +240,23 @@ class AppLocalizationsId extends AppLocalizations {
       'Pengenalan suara tidak tersedia di perangkat ini atau izin mikrofon ditolak.';
 
   @override
+  String get micPermissionTitle => 'Akses mikrofon';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter menggunakan mikrofon untuk mengikuti suara Anda dan menggulir teks secara otomatis. Audio diproses di perangkat Anda untuk pengenalan suara — tidak direkam atau dibagikan.';
+
+  @override
+  String get continueLabel => 'Lanjutkan';
+
+  @override
+  String get micPermissionDenied =>
+      'Izin mikrofon ditolak. Aktifkan di Pengaturan untuk menggunakan gulir suara.';
+
+  @override
+  String get openSettings => 'Buka pengaturan';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

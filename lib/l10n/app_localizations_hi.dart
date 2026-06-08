@@ -240,6 +240,23 @@ class AppLocalizationsHi extends AppLocalizations {
       'इस डिवाइस पर वाक् पहचान उपलब्ध नहीं है या माइक्रोफ़ोन की अनुमति अस्वीकृत है।';
 
   @override
+  String get micPermissionTitle => 'माइक्रोफ़ोन एक्सेस';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter आपकी आवाज़ का अनुसरण करने और टेक्स्ट को स्वचालित रूप से स्क्रॉल करने के लिए माइक्रोफ़ोन का उपयोग करता है। ऑडियो को वाक् पहचान के लिए आपके डिवाइस पर ही संसाधित किया जाता है — इसे रिकॉर्ड या साझा नहीं किया जाता।';
+
+  @override
+  String get continueLabel => 'जारी रखें';
+
+  @override
+  String get micPermissionDenied =>
+      'माइक्रोफ़ोन अनुमति अस्वीकृत। वॉइस स्क्रॉलिंग उपयोग करने के लिए इसे सेटिंग्स में सक्षम करें।';
+
+  @override
+  String get openSettings => 'सेटिंग्स खोलें';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

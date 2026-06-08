@@ -81,5 +81,11 @@
   "startReading": "Mulai membaca",
   "speechUnavailable": "Pengenalan suara tidak tersedia di perangkat ini atau izin mikrofon ditolak.",
 
-  "readingStatsLabel": "{count, plural, other{{count} kata}} · ~{time}"
+  "readingStatsLabel": "{count, plural, other{{count} kata}} · ~{time}",
+
+  "micPermissionTitle": "Akses mikrofon",
+  "micPermissionRationale": "Autoprompter menggunakan mikrofon untuk mengikuti suara Anda dan menggulir teks secara otomatis. Audio diproses di perangkat Anda untuk pengenalan suara — tidak direkam atau dibagikan.",
+  "continueLabel": "Lanjutkan",
+  "micPermissionDenied": "Izin mikrofon ditolak. Aktifkan di Pengaturan untuk menggunakan gulir suara.",
+  "openSettings": "Buka pengaturan"
 }

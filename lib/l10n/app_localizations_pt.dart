@@ -240,6 +240,23 @@ class AppLocalizationsPt extends AppLocalizations {
       'O reconhecimento de voz não está disponível neste dispositivo ou a permissão do microfone foi negada.';
 
   @override
+  String get micPermissionTitle => 'Acesso ao microfone';
+
+  @override
+  String get micPermissionRationale =>
+      'O Autoprompter usa o microfone para seguir sua voz e rolar o texto automaticamente. O áudio é processado no seu dispositivo para o reconhecimento de voz: não é gravado nem compartilhado.';
+
+  @override
+  String get continueLabel => 'Continuar';
+
+  @override
+  String get micPermissionDenied =>
+      'Permissão do microfone negada. Ative-a nas Configurações para usar a rolagem por voz.';
+
+  @override
+  String get openSettings => 'Abrir configurações';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

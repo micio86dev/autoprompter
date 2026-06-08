@@ -81,5 +81,11 @@
   "startReading": "Lesen starten",
   "speechUnavailable": "Die Spracherkennung ist auf diesem Gerät nicht verfügbar oder die Mikrofonberechtigung wurde verweigert.",
 
-  "readingStatsLabel": "{count, plural, =1{1 Wort} other{{count} Wörter}} · ~{time}"
+  "readingStatsLabel": "{count, plural, =1{1 Wort} other{{count} Wörter}} · ~{time}",
+
+  "micPermissionTitle": "Mikrofonzugriff",
+  "micPermissionRationale": "Autoprompter verwendet das Mikrofon, um deiner Stimme zu folgen und den Text automatisch zu scrollen. Audio wird zur Spracherkennung auf deinem Gerät verarbeitet – es wird nicht aufgezeichnet oder geteilt.",
+  "continueLabel": "Weiter",
+  "micPermissionDenied": "Mikrofonberechtigung verweigert. Aktiviere sie in den Einstellungen, um das Scrollen per Stimme zu nutzen.",
+  "openSettings": "Einstellungen öffnen"
 }

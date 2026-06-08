@@ -236,6 +236,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get speechUnavailable => '此设备不支持语音识别，或麦克风权限被拒绝。';
 
   @override
+  String get micPermissionTitle => '麦克风权限';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter 使用麦克风跟随你的声音并自动滚动文本。音频在你的设备上进行语音识别处理，不会被录制或分享。';
+
+  @override
+  String get continueLabel => '继续';
+
+  @override
+  String get micPermissionDenied => '麦克风权限被拒绝。请在“设置”中启用，以使用语音滚动。';
+
+  @override
+  String get openSettings => '打开设置';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

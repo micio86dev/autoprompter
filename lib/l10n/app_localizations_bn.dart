@@ -240,6 +240,23 @@ class AppLocalizationsBn extends AppLocalizations {
       'এই ডিভাইসে ভয়েস শনাক্তকরণ উপলব্ধ নয় বা মাইক্রোফোনের অনুমতি প্রত্যাখ্যান করা হয়েছে।';
 
   @override
+  String get micPermissionTitle => 'মাইক্রোফোন অ্যাক্সেস';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter আপনার কণ্ঠস্বর অনুসরণ করতে এবং টেক্সট স্বয়ংক্রিয়ভাবে স্ক্রোল করতে মাইক্রোফোন ব্যবহার করে। অডিও ভয়েস শনাক্তকরণের জন্য আপনার ডিভাইসেই প্রক্রিয়া করা হয় — এটি রেকর্ড বা শেয়ার করা হয় না।';
+
+  @override
+  String get continueLabel => 'চালিয়ে যান';
+
+  @override
+  String get micPermissionDenied =>
+      'মাইক্রোফোন অনুমতি প্রত্যাখ্যান করা হয়েছে। ভয়েস স্ক্রোলিং ব্যবহার করতে সেটিংসে এটি সক্ষম করুন।';
+
+  @override
+  String get openSettings => 'সেটিংস খুলুন';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

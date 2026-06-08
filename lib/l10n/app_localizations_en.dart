@@ -240,6 +240,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Speech recognition is unavailable on this device or microphone permission was denied.';
 
   @override
+  String get micPermissionTitle => 'Microphone access';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter uses the microphone to follow your voice and scroll the text automatically. Audio is processed on your device for speech recognition — it is not recorded or shared.';
+
+  @override
+  String get continueLabel => 'Continue';
+
+  @override
+  String get micPermissionDenied =>
+      'Microphone permission denied. Enable it in Settings to use voice scrolling.';
+
+  @override
+  String get openSettings => 'Open settings';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

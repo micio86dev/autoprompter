@@ -237,6 +237,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get speechUnavailable => 'この端末では音声認識を利用できないか、マイクの権限が拒否されています。';
 
   @override
+  String get micPermissionTitle => 'マイクへのアクセス';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter は、あなたの声に合わせてテキストを自動でスクロールするためにマイクを使用します。音声は音声認識のために端末内で処理され、録音や共有はされません。';
+
+  @override
+  String get continueLabel => '続ける';
+
+  @override
+  String get micPermissionDenied => 'マイクの権限が拒否されました。音声スクロールを使うには設定で有効にしてください。';
+
+  @override
+  String get openSettings => '設定を開く';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

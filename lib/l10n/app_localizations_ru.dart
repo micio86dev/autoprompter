@@ -242,6 +242,23 @@ class AppLocalizationsRu extends AppLocalizations {
       'Распознавание речи недоступно на этом устройстве или нет доступа к микрофону.';
 
   @override
+  String get micPermissionTitle => 'Доступ к микрофону';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter использует микрофон, чтобы следовать за вашим голосом и автоматически прокручивать текст. Звук обрабатывается на вашем устройстве для распознавания речи — он не записывается и не передаётся.';
+
+  @override
+  String get continueLabel => 'Продолжить';
+
+  @override
+  String get micPermissionDenied =>
+      'Доступ к микрофону запрещён. Включите его в настройках, чтобы использовать прокрутку голосом.';
+
+  @override
+  String get openSettings => 'Открыть настройки';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

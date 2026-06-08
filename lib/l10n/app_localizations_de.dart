@@ -240,6 +240,23 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die Spracherkennung ist auf diesem Gerät nicht verfügbar oder die Mikrofonberechtigung wurde verweigert.';
 
   @override
+  String get micPermissionTitle => 'Mikrofonzugriff';
+
+  @override
+  String get micPermissionRationale =>
+      'Autoprompter verwendet das Mikrofon, um deiner Stimme zu folgen und den Text automatisch zu scrollen. Audio wird zur Spracherkennung auf deinem Gerät verarbeitet – es wird nicht aufgezeichnet oder geteilt.';
+
+  @override
+  String get continueLabel => 'Weiter';
+
+  @override
+  String get micPermissionDenied =>
+      'Mikrofonberechtigung verweigert. Aktiviere sie in den Einstellungen, um das Scrollen per Stimme zu nutzen.';
+
+  @override
+  String get openSettings => 'Einstellungen öffnen';
+
+  @override
   String readingStatsLabel(int count, String time) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

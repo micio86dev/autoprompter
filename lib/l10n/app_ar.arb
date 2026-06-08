@@ -81,5 +81,11 @@
   "startReading": "بدء القراءة",
   "speechUnavailable": "التعرّف على الكلام غير متاح على هذا الجهاز أو تم رفض إذن الميكروفون.",
 
-  "readingStatsLabel": "{count, plural, =1{كلمة واحدة} other{{count} كلمة}} · ~{time}"
+  "readingStatsLabel": "{count, plural, =1{كلمة واحدة} other{{count} كلمة}} · ~{time}",
+
+  "micPermissionTitle": "الوصول إلى الميكروفون",
+  "micPermissionRationale": "يستخدم Autoprompter الميكروفون لمتابعة صوتك وتمرير النص تلقائيًا. تتم معالجة الصوت على جهازك للتعرّف على الكلام، ولا يتم تسجيله أو مشاركته.",
+  "continueLabel": "متابعة",
+  "micPermissionDenied": "تم رفض إذن الميكروفون. فعّله من الإعدادات لاستخدام التمرير الصوتي.",
+  "openSettings": "فتح الإعدادات"
 }

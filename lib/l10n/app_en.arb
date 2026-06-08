@@ -119,6 +119,12 @@
   "startReading": "Start reading",
   "speechUnavailable": "Speech recognition is unavailable on this device or microphone permission was denied.",
 
+  "micPermissionTitle": "Microphone access",
+  "micPermissionRationale": "Autoprompter uses the microphone to follow your voice and scroll the text automatically. Audio is processed on your device for speech recognition — it is not recorded or shared.",
+  "continueLabel": "Continue",
+  "micPermissionDenied": "Microphone permission denied. Enable it in Settings to use voice scrolling.",
+  "openSettings": "Open settings",
+
   "readingStatsLabel": "{count, plural, =1{1 word} other{{count} words}} · ~{time}",
   "@readingStatsLabel": {
     "description": "Word count and estimated reading time shown under the editor.",

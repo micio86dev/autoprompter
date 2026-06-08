@@ -1,3 +1,4 @@
+import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -57,10 +58,21 @@ class SttSpeechService implements SpeechService {
     if (_available) return true;
     _available = await _stt.initialize(
       onStatus: _handleStatus,
-      onError: (e) => _onError?.call(e.errorMsg),
+      onError: _handleError,
       debugLogging: false,
     );
     return _available;
+  }
+
+  /// Speech errors are either transient or permanent. Transient ones
+  /// (e.g. `error_no_match`, `error_speech_timeout`) are routine during
+  /// continuous dictation — the native session ends and [_handleStatus]
+  /// restarts it — so we must NOT surface them as a UI error. Only permanent
+  /// errors (e.g. permission denied, recognizer unavailable) are reported.
+  void _handleError(SpeechRecognitionError error) {
+    if (error.permanent) {
+      _onError?.call(error.errorMsg);
+    }
   }
 
   @override

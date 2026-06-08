@@ -88,7 +88,13 @@ class _TeleprompterScreenState extends State<TeleprompterScreen>
       localeId: widget.prompt.localeId,
       onWords: _onWords,
       onListeningChanged: (listening) {
-        if (mounted) setState(() => _listening = listening);
+        if (mounted) {
+          setState(() {
+            _listening = listening;
+            // Clear any stale error banner once recognition is active again.
+            if (listening) _message = null;
+          });
+        }
       },
       onError: (msg) {
         if (mounted) setState(() => _message = msg);

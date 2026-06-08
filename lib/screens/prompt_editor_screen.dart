@@ -41,6 +41,12 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
   late final TextEditingController _titleController;
   final TextEditingController _tagController = TextEditingController();
   late final QuillController _quillController;
+  // Persistent focus/scroll nodes for the Quill editor. They MUST outlive the
+  // frequent rebuilds (the document listener calls setState on every change);
+  // recreating them each build resets the IME connection and breaks editing
+  // (e.g. backspace/deletion stops working on Android).
+  final FocusNode _editorFocusNode = FocusNode();
+  final ScrollController _editorScrollController = ScrollController();
   late String _localeId;
   late List<String> _tags;
 
@@ -88,6 +94,8 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
     _titleController.dispose();
     _tagController.dispose();
     _quillController.dispose();
+    _editorFocusNode.dispose();
+    _editorScrollController.dispose();
     super.dispose();
   }
 
@@ -278,8 +286,10 @@ class _PromptEditorScreenState extends State<PromptEditorScreen> {
     final l10n = AppLocalizations.of(context);
     final editor = Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: QuillEditor.basic(
+      child: QuillEditor(
         controller: _quillController,
+        focusNode: _editorFocusNode,
+        scrollController: _editorScrollController,
         config: QuillEditorConfig(
           placeholder: l10n.editorPlaceholder,
           padding: const EdgeInsets.symmetric(vertical: 12),

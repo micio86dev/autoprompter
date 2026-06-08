@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../services/word_matcher.dart';
@@ -7,9 +6,14 @@ import '../services/word_matcher.dart';
 /// words dimmed, the current word highlighted, upcoming words bright. The
 /// current word carries [currentWordKey] for scrolling.
 ///
+/// Every word is laid out inside an identically-sized padded box (transparent
+/// for non-current words, filled for the current one) and shares the same font
+/// weight. This keeps each word's footprint constant regardless of highlight
+/// state, so the surrounding text never shifts as the highlight advances.
+///
 /// Tapping a word calls [onWordTap], used to manually reposition the reading
 /// point.
-class TeleprompterText extends StatefulWidget {
+class TeleprompterText extends StatelessWidget {
   const TeleprompterText({
     super.key,
     required this.segments,
@@ -29,98 +33,59 @@ class TeleprompterText extends StatefulWidget {
   final ValueChanged<int>? onWordTap;
   final double bottomPadding;
 
-  @override
-  State<TeleprompterText> createState() => _TeleprompterTextState();
-}
-
-class _TeleprompterTextState extends State<TeleprompterText> {
   static const _readColor = Color(0x66FFFFFF); // read: dimmed
   static const _upcomingColor = Color(0xFFFFFFFF); // upcoming
   static const _currentColor = Color(0xFF101010); // highlighted text
   static const _currentBg = Color(0xFFFFC107); // current word background
 
-  /// Recognizers for tapping on words; rebuilt on every build and cleaned up to
-  /// avoid leaks.
-  final List<TapGestureRecognizer> _recognizers = [];
-
-  @override
-  void dispose() {
-    _disposeRecognizers();
-    super.dispose();
-  }
-
-  void _disposeRecognizers() {
-    for (final r in _recognizers) {
-      r.dispose();
-    }
-    _recognizers.clear();
-  }
-
-  TapGestureRecognizer _recognizerFor(int wordIndex) {
-    final r = TapGestureRecognizer()
-      ..onTap = () => widget.onWordTap?.call(wordIndex);
-    _recognizers.add(r);
-    return r;
-  }
+  // Horizontal padding applied to EVERY word box so widths stay constant
+  // whether or not a word is the highlighted one.
+  static const EdgeInsets _wordPadding = EdgeInsets.symmetric(horizontal: 2);
 
   @override
   Widget build(BuildContext context) {
-    _disposeRecognizers();
-
     final baseStyle = TextStyle(
-      fontSize: widget.fontSize,
+      fontSize: fontSize,
       height: 1.5,
       color: _upcomingColor,
-      fontWeight: FontWeight.w500,
+      // Constant weight across states: changing weight per word would alter its
+      // width and shift the surrounding text as the highlight moves.
+      fontWeight: FontWeight.w600,
     );
 
     final spans = <InlineSpan>[];
-    for (final seg in widget.segments) {
+    for (final seg in segments) {
       if (!seg.isWord) {
         spans.add(TextSpan(text: seg.text, style: baseStyle));
         continue;
       }
-      if (seg.wordIndex == widget.currentIndex) {
-        spans.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.baseline,
-            baseline: TextBaseline.alphabetic,
-            child: GestureDetector(
-              onTap: () => widget.onWordTap?.call(seg.wordIndex),
-              child: Container(
-                key: widget.currentWordKey,
-                decoration: BoxDecoration(
-                  color: _currentBg,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Text(
-                  seg.text,
-                  style: baseStyle.copyWith(
-                    color: _currentColor,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+      final isCurrent = seg.wordIndex == currentIndex;
+      final read = seg.wordIndex < currentIndex;
+      final color =
+          isCurrent ? _currentColor : (read ? _readColor : _upcomingColor);
+      spans.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.baseline,
+          baseline: TextBaseline.alphabetic,
+          child: GestureDetector(
+            onTap: onWordTap == null ? null : () => onWordTap!(seg.wordIndex),
+            child: Container(
+              key: isCurrent ? currentWordKey : null,
+              padding: _wordPadding,
+              decoration: BoxDecoration(
+                color: isCurrent ? _currentBg : Colors.transparent,
+                borderRadius: BorderRadius.circular(4),
               ),
+              child: Text(seg.text, style: baseStyle.copyWith(color: color)),
             ),
           ),
-        );
-      } else {
-        final read = seg.wordIndex < widget.currentIndex;
-        spans.add(TextSpan(
-          text: seg.text,
-          style: baseStyle.copyWith(
-            color: read ? _readColor : _upcomingColor,
-          ),
-          recognizer:
-              widget.onWordTap == null ? null : _recognizerFor(seg.wordIndex),
-        ));
-      }
+        ),
+      );
     }
 
     return SingleChildScrollView(
-      controller: widget.scrollController,
-      padding: EdgeInsets.fromLTRB(20, 40, 20, widget.bottomPadding),
+      controller: scrollController,
+      padding: EdgeInsets.fromLTRB(20, 40, 20, bottomPadding),
       child: Text.rich(TextSpan(children: spans)),
     );
   }
